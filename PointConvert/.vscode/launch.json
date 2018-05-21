@@ -1,0 +1,52 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            //******************Modify by ymf 2018/04/25 Begin**********************
+            // "program": "enter program name, for example ${workspaceFolder}/a.out",
+            "program": "${workspaceFolder}/build/CoordinateConvert",
+            "args": ["1", "1", "45"],
+            "stopAtEntry": true,
+             //******************Modify by ymf 2018/04/25 End************************
+            //******************Modify by ymf 2018/04/25 Begin**********************
+            // "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}",
+            //******************Modify by ymf 2018/04/25 End************************
+            "environment": [],
+            "externalConsole": true,
+            //******************Modify by ymf 2018/04/25 Begin**********************
+            // "MIMode": "gdb",
+            // "setupCommands": [
+            //     {
+            //         "description": "Enable pretty-printing for gdb",
+            //         "text": "-enable-pretty-printing",
+            //         "ignoreFailures": true
+            //     }
+            // ]
+            "linux": {
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            "osx": {
+                "MIMode": "lldb"
+            },
+            "windows": {
+                "MIMode": "gdb"
+            },
+            //******************Modify by ymf 2018/04/25 End************************
+            "preLaunchTask": "Build"
+        }
+    ]
+}

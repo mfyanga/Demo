@@ -1,0 +1,38 @@
+1.二维坐标转换公式
+  需求描述：有两套笛卡尔坐标系XOY和X`O`Y`,X`O`Y`相对于XOY坐标系进行了平移（x_shift, y_shift）和旋转(angle, 弧度)变换。一个点在XOY坐标系中的坐标为(x, y),请计算该点在X`O`Y`坐标系中的坐标（x_prime, y_prime）。
+  要求：1）使用C++ 标准库（STL库）算法；
+        2）使用C++标准的Lambda表达式；
+        3）使用C++11标准库中的随机数生成器随机生成1000个[-100, 100]内的均匀随机数坐标进行测试；
+        4）使用C++11标准库中的计时方法计算坐标系转换函数所花费的时间。
+
+  需求分析：针对笛卡尔直角坐标系。
+  已知：坐标系XOY----->坐标系X`O`Y`,经过平移（x_shift, y_shift）和旋转(angle, 弧度)。
+  假设：坐标系XOY任意点A(x, y)对应坐标系X`O`Y`中的坐标为 A`(x_prime, y_prime）`
+
+  分析：A->A`的转换可以分解和旋转两步。
+  1）平移：坐标系XOY平移可以看做坐标系XOY不动，点平移了，假设此时点坐标用T(Xt, yT)表示。
+      坐标轴平移（x_shift, y_shift），那么转成点平移可以表示为（（-1）* x_shift, （-1）* y_shift）//与坐标轴反 着平移。可以如下表示转换后的点坐标：
+     Xt = x + （-1）* x_shift;
+     yT = y + （-1）* y_shift;
+  2)旋转：坐标轴转动可以看做坐标轴不动，点转动了，此时坐标点为T(Xt, yT)，无论坐标怎么转T点到坐标原点的距离时不会变的。
+    轴旋转(angle, 弧度)，那么转成点旋转((-1) * angle, 弧度) //相对坐标旋转时反着转
+    假设T点相对于X轴正方向夹角为A，点T与原点的距离为R。
+    可以如下表示旋转后的点的坐标：
+    旋转后点T与新坐标X轴正方向夹角为At=A+(-1) * angle)
+    那么坐标点A`(x_prime, y_prime）为
+    x_prime = R * cos(At)
+    y_prime = R * sin(At)
+    
+   公式推导
+   R = sqrt ((x-x_shift) * (x-x_shift) + (y-y_shift) × (y-y_shift)）
+   x_prime = R * cos(At) = R *  (cos(A - angle)) = R * （cos(A)cos(angle) + sin(A)*sin(angle)）
+           = R * ((x-x_shift) / R * cos(angle) + (y - y_shift) / R * sin(angle) )
+           = (x-x_shift) * cos(angle) + (y - y_shift) * sin(angle)
+   同理可推到出
+   y_prime = (y - y_shift)cos(angle) - (x-x_shift) sin(angle)
+    
+   反向公式：已知 X`O`Y'坐标点(x_prime, y_prime) 求出XOY坐标点(x, y)  
+   x = x_prime * cos(angle) - y_prime * sin(angle) + x_shift
+   y = y_prime * cos(angle) + x_prime * sin(angle) + y_shift
+  
+ 

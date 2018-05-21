@@ -1,0 +1,16 @@
+/************************************************************************************************
+Cartesian coordinates XOY to Cartesian coordinates X`O`Y` by move(1 , 1) and rotate 45 degrees
+*************************************************************************************************/
+SrcPoint:(0 , 0) to DestPoint(-1.41421 , 0) cost 0.031093ms
+SrcPoint:(2 , 4) to DestPoint(2.82843 , 1.41421) cost 0.001481ms
+SrcPoint:(3 , 4) to DestPoint(3.53553 , 0.707107) cost 0.000737ms
+SrcPoint:(4 , 5) to DestPoint(4.94975 , 0.707107) cost 0.000683ms
+SrcPoint:(4 , 4) to DestPoint(4.24264 , 0) cost 0.000758ms
+SrcPoint:(7 , 4) to DestPoint(6.36396 , -2.12132) cost 0.000888ms
+SrcPoint:(8 , 3) to DestPoint(6.36396 , -3.53553) cost 0.000739ms
+SrcPoint:(-2 , 4) to DestPoint(0 , 4.24264) cost 0.000821ms
+SrcPoint:(3 , -4) to DestPoint(-2.12132 , -4.94975) cost 0.000686ms
+SrcPoint:(-4 , -5) to DestPoint(-7.77817 , -0.707107) cost 0.000634ms
+SrcPoint:(-4 , 4) to DestPoint(-1.41421 , 5.65685) cost 0.000721ms
+SrcPoint:(-7 , 4) to DestPoint(-3.53553 , 7.77817) cost 0.000639ms
+SrcPoint:(8 , -3) to DestPoint(2.12132 , -7.77817) cost 0.000676ms
