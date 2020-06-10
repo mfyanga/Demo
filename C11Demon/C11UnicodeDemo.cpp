@@ -2,7 +2,14 @@
 //no this header file
 //#include <cuchar> no 
 #include <locale>
+#include <fstream>
 using namespace std;
+
+struct SVehicle {
+
+private:
+   int a = 0;
+};
 
 int main(int atgc, char **argv)
 {
@@ -59,5 +66,14 @@ int main(int atgc, char **argv)
     {
         cout << "Do not support utf-32 to utf-8 facet" << endl;
     }
+    std::string file_name = "./test.log";
+    std::ofstream ofs;
+    ofs.open(file_name, ios::out| ios::app);
+    if (ofs.is_open()) {
+        ofs << "test" << std::endl;
+    }
+    ofs.close();
+
+   SVehicle st;
     return 0;
 }

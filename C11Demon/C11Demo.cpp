@@ -12,6 +12,11 @@ void Handle(int iNum)
     cout << "signal num=" << iNum << endl;
     exit(0);
 }
+struct VehicleState {
+
+private:
+   int a = 0;
+}
 
 class CPerson
 {
