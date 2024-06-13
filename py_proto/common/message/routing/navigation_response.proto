@@ -1,0 +1,55 @@
+syntax = "proto2";
+
+package  citibot.common.routing;
+
+import "common/message/geometry.proto";
+import "common/message/map/map_parking_space.proto";
+import "common/message/routing/routing.proto";
+
+message NaviPath{
+  // 路径所含的地理坐标点索引
+  required uint64 path_index = 1;
+  // 组成路径的点
+  repeated citibot.common.message.PointLLH points = 2;
+}
+
+// 路线
+message NaviRoute {
+  //路线索引。本路线在方案中的索引位置
+  required uint64 route_index = 1;
+  //路线包含的路径个数
+  required uint64 num_paths = 2;
+  repeated NaviPath paths = 3;
+}
+
+// 路线方案
+message NaviRoutePlan {
+  // 路线方案索引
+  required uint64 route_plan_index = 1;
+  // 方案所含路线个数
+  required uint64 num_routes = 2;
+  repeated NaviRoute routes = 3;
+  // 方案总里程
+  optional Measurement measurement = 4;
+  // 导航指定车位，不可选择
+  repeated citibot.common.hdmap.ParkingSpace parking_spaces = 5;
+  // 候选车位，可修改
+  optional CandidateParkingSpace candidate_parking_spaces = 6;
+}
+
+// 路线方案集合
+message NaviRoutePlans {
+  // 路线起点
+  required citibot.common.message.PointLLH start = 1;
+  // 路线终点
+  required citibot.common.message.PointLLH end = 2;
+  // 路线方案个数
+  required uint64 num_plans = 3;
+  repeated NaviRoutePlan route_plans = 4;
+}
+
+// 导航响应消息
+message NavigationResponse {
+  required string msg = 1;
+  optional NaviRoutePlans plans = 2;
+}

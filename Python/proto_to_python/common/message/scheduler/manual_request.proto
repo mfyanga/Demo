@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+message ManualRequestProto {
+  enum ManualRequestType {  
+    CHANGE_LEFT = 0;//向左变道
+    CHANGE_RIGHT = 1;//向右变道
+    PULLOVER_STOP =2; //靠边停车
+    START = 3; //起步
+    STOP = 4; //停车
+}
+  optional ManualRequestType type =1; // 人工干预类型
+} 
+

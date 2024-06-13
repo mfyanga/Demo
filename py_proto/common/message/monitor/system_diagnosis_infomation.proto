@@ -1,0 +1,26 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/header.proto";
+
+message NodeSystemInfo {
+  optional uint32 node_id = 1 [default = 0];   // 节点ID
+  optional string node_name = 2;               // 节点名称
+  optional uint32 cpu_usage = 3 [default = 0]; // 已使用CPU资源百分比
+  optional uint32 mem_usage = 4 [default = 0]; //已使用内存资源百分比
+  repeated uint32 error_codes = 5;             //节点故障码
+}
+
+message SystemDiagInfoMsg {
+  optional Header header = 1;                    // 头文件
+  optional int32 system_dtcs = 2;                // 系统故障码
+  optional int32 machine_temp = 3 [default = 0]; // 处理器温度
+  optional int32 cpu_usage = 4 [default = 0]; // 已使用CPU资源百分比(整个系统)
+  optional int32 mem_usage = 5 [default = 0]; //已使用内存资源百分比(整个系统)
+  optional int32 disk_usage = 6 [default = 0]; // 已使用硬盘空间百分比
+  optional int32 disk_used = 7 [default = 0]; // 已使用的磁盘空间大小（G）
+  optional int32 disk_capacity = 8 [default = 0]; // 总磁盘空间大小（G）
+  repeated NodeSystemInfo node_info = 9; // 节点系统资源消耗信息
+  repeated string user_dtc = 10; // 用户诊断故障码
+}

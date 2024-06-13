@@ -1,0 +1,24 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/header.proto"; 
+import "common/message/geometry.proto";
+
+
+message DeviceInfo{
+    optional string device_name = 1;
+    optional uint64 device_timestamp = 2;
+}
+
+message ExternalGpsInfo{
+    optional uint64 timestamp = 1;  // 更新时间戳
+    optional PointLLH gps = 2;      // GPS点
+    optional double heading = 3;    // 朝向角
+}
+
+message DeviceInputMsg{
+    optional Header header = 1;                             // 通用消息头
+    optional ExternalGpsInfo external_gps = 2;              // 外部GPS信息
+    repeated DeviceInfo devices = 3;                        // 外部设备信息
+}

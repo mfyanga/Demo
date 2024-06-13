@@ -1,0 +1,60 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/header.proto"; 
+import "common/message/geometry.proto";
+
+enum ResponseStatus{
+    UNDEFINED = 0;
+    PROCESSING = 1;
+    COMPLETE = 2;
+    FAILED = 3;
+    TIMEOUT = 4;
+    CANCEL = 5;
+}
+
+enum ResponseDataType{
+    ROUTING_RESULT = 1;
+}
+
+enum MissionStage{
+    INITAL = 0;                 // 任务初始阶段
+    ROUTING = 1;                // 选路阶段
+    NAVIGATE = 2;               // 导航阶段
+    MOVING = 3;                 // 移动中
+    SUSPENDING = 4;             // 移动暂停中
+    MOVE_ARRIVED = 5;           // 到达目标区域
+    MOVE_FINISHED = 6;          // 移动完成
+    TASK_FINISHED = 7;          // 所有任务完成
+}
+
+message SuspendInfo{
+    enum SuspendType{
+        BLOCKING = 1;
+        EMERGENCY_TRIGGER = 2;
+        FAULT_TRIGGER = 3;
+        INTERVENTION = 4;
+    }
+    optional SuspendType type = 1;                      // 暂停原因类型
+    optional PointLLH suspend_position = 2;             // 暂停时地点
+    optional string fault_code = 3;                     // 如果时故障导致时，引发停车的故障码
+    optional string information = 4;                    // 描述信息
+}
+
+message MissionStatus{
+    optional MissionStage stage = 1;                    // 当前的阶段类型
+    optional bytes route_response = 2;                  // 当阶段为NAVIGATE时，附带的导航路径信息
+    optional SuspendInfo suspend_info = 3;              // 当阶段为SUSPENDING时，附带的详细信息
+}
+
+message SystemOutput{
+    optional Header header = 1;
+    optional uint64 token = 2;
+    optional ResponseStatus status = 3;
+    optional int32 error_code = 4;
+    optional string description = 5;
+    optional ResponseDataType data_type = 6;
+    optional bytes data = 7;                        // 放置一些需要反馈具体数据的proto数据
+    optional MissionStatus mission_status = 8;      // 云平台mission的详细状态信息输出
+}

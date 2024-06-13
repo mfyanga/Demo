@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/header.proto";
+
+enum RecordStatus {
+  RECORDING = 0;     //正在录制
+  RECORD_FINISH = 1; // 结束录制
+  RECORD_FAILED = 2; // 录制失败
+}
+
+message DataRecordStatusMsg {
+  optional Header header = 1;              // 通用消息头
+  optional uint64 token = 2;               // 任务token
+  optional RecordStatus record_status = 3; // 录制状态
+  repeated int32 instance_id = 4;          // 可采集消息
+}
+
+message DataRecordStatus{
+  optional uint64 token = 1;               // 任务token
+  optional RecordStatus record_status = 2; // 录制状态
+}
+
+// 后续替代目前的DataRecordStatusMsg
+message DataRecordMsg {
+  optional Header header = 1;                               // 通用消息头
+  optional DataRecordStatus common_record_status = 2;       // 常规录制状态
+  optional DataRecordStatus cyclic_record_status = 3;       // 循环取证录制状态
+  optional DataRecordStatus closed_loop_record_status = 4;  // 闭环录制状态
+  repeated int32 instance_id = 20;                          // 可采集消息
+}

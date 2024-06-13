@@ -1,0 +1,90 @@
+syntax = "proto2";
+
+package citibot.navigation;
+
+import "common/message/header.proto";
+import "common/message/geometry.proto";
+import "common/message/localization/localization.proto";
+
+message Curved {
+    repeated common.message.Point3D points = 1;
+}
+
+enum RoadType{
+    UNKNOWN = 0;
+    HIGHWAY = 1;
+    CITY_ROAD = 2;
+    PARK = 3;
+    MINE = 4;
+}
+
+message Road{
+    optional string id = 1;
+    optional Curved left_boundary = 2;
+    optional Curved right_boundary = 3;
+    optional RoadType type = 4;
+}
+
+enum TrafficElementType{
+    STOP_SIGN = 0;
+    YIELD_SIGN = 1;
+    SPEED_BUMP = 2;
+    BARRIER = 3;
+    GANTRY = 4;
+    QUEUING = 5;
+    DESTINATION = 6;
+    CLEAR_AREA = 30;
+    CROSSWALK = 31;
+    JUNCTION = 32;
+    BRIDGE_ABOVE = 33;
+    DOWNHILL = 34;
+    UPHILL = 35;
+    TOLL_STATION = 36;
+    FREE_AREA = 60;
+    REGION_OVERLAP_INFO = 61;
+    SIGNAL = 80;
+    PARKING_SPACE = 81;
+    OTHERS = 99;
+    BUS_STATION = 37;
+    EMERGENCY_PARKING_STRIP = 38;
+    STATION = 82;
+    NARROW_ROAD = 41;
+    FORBIDDEN_AREA = 39;
+}
+
+enum TrafficElementDataType{
+    CURVE_SIGN = 1;
+    POLYGON_SIGN = 2;
+    SIGNAL_TYPE = 3;
+    PARKING_SPACE_TYPE = 4;
+    STATION_TYPE = 5;
+}
+
+message TrafficElementPosition{
+    optional string id = 1;
+    optional TrafficElementType type = 2;
+    optional TrafficElementDataType data_type = 3;
+    optional double start_s = 4;
+    optional double end_s = 5;
+}
+
+
+message RoiRegion{
+    map<string,Road> road_boundarys = 1;
+    repeated TrafficElementPosition polygons = 2;
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+message LaneSampleAssociation{
+    optional double start_s = 1;
+    optional double end_s = 2;
+    optional double width = 3;
+}
+
+//附加在NavigationMap autosar结构的proto_data里面
+message NavigationMapMsg{
+    optional common.message.Header header = 1;
+    //暂时填充position和heading
+    optional common.message.Localization localization = 2;
+}

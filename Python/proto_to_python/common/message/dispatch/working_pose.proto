@@ -1,0 +1,37 @@
+syntax = "proto2";
+
+import "common/message/geometry.proto";
+import "common/message/map/map_id.proto";
+
+package citibot.common.dispatch;
+
+//位姿标签
+enum PoseFlag{
+    kFlagNone = 0; //未定义
+    kFlagLoad = 1;  //装矿位姿
+    kFlagDump = 2; //卸矿位姿
+}
+
+enum PoseType {
+    kUnknown = 0;
+    kOriginal = 1;
+    kDestination = 2;
+}
+
+//卡车的装、卸料位姿
+message WorkingPose
+{
+    // Position of the vehicle reference point (VRP) in the map reference frame.
+    // The VRP is the center of rear axle.
+    optional citibot.common.message.PointENU position = 1;
+
+    // Heading
+    // The heading is zero when the car is facing East and positive when facing
+    // North.
+    optional double heading = 2;
+    repeated citibot.common.hdmap.Id overlap_id = 3;
+    optional PoseFlag pose_flag = 4;
+    optional PoseType pose_type = 5;
+    // 装矿区爆堆ID，开放空间更新WorkingPose时提供
+    optional citibot.common.hdmap.Id match_id = 6;
+}

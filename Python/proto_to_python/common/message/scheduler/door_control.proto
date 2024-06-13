@@ -1,0 +1,28 @@
+syntax = "proto2";
+package citibot.common.message;
+
+
+enum DoorID{
+  FRONT_DOOR = 1;//前门  (公交车前门，火车驾驶舱门)
+  MIDDLE_DOOR= 2;//中门 （公交车中门）
+  BACK_DOOR = 3;//后门（公交车后门）
+  CARGO_BOX_DOOR = 4;//货箱卷帘门
+}
+
+enum DoorAction {
+  OPEN = 1;
+  CLOSE = 2;
+  STOP = 3;//只对卷帘门有效
+}
+
+// 门控制指令
+message DoorControlCmd{
+  optional DoorID door_id = 1;
+  optional DoorAction action = 2;
+}
+
+//can指令下发
+message DoorControlProto {
+  optional DoorControlCmd door_cmd = 1; //车门控制
+}
+

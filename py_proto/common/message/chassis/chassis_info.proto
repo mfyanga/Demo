@@ -1,0 +1,255 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/header.proto";
+import "common/message/chassis/chassis_util.proto";
+
+// 调用规则：
+// 1.模式类（Mode）可以下发请求和状态共用
+// 2.状态类（Status）的下发则使用对应的请求（Request），一般命名配对
+// 3.对于开关二元的设备，统一使用通用开关请求和状态数据结构（OnOffRequest和OnOffRequest）
+
+message ChassisInfoMsg {
+  // 消息头
+  optional Header header = 1;
+  // 底盘运行模式
+  optional ChassisMode chassis_mode = 2 [default = CHASSIS_MODE_INIT];
+  // 底盘车速  单位：m/s
+  optional double speed_mps = 3 [default = 0.0];
+
+  // 驾驶模式请求，回环控制
+  optional DrivingRequest driving_request = 4;
+
+  // 油门相应模式  速度模式/开度模式
+  optional ThrottleMode throttle_mode = 9 [default = THROTTLE_MODE_PEDAL];
+  // 油门实际执行开度  0~100
+  optional double throttle_pedal = 10 [default = 0.0];
+  // 挡位
+  optional GearMode gear = 11 [default = NO_USE];
+  // 制动实际执行开度  0~100
+  optional double brake_pedal = 12 [default = 0.0];
+  // 制动气压  单位：kp
+  optional double brake_pressure = 13 [default = 0.0];
+  // 手刹状态
+  optional EpbStatus epb_state = 14 [default = EPB_STATUS_UNKNOWN];
+  // 实际转向模式
+  optional SteeringMode steering_mode = 16
+      [default = STEERING_MODE_FRONT_ACKERMAN];
+  // 前轮转角
+  optional double steering_front_angle = 17 [default = 0.0];
+  // 后轮转角
+  optional double steering_rear_angle = 18 [default = 0.0];
+  // 转向速度
+  optional double steering_angle_rate = 19 [default = 0.0];
+
+  // 底盘车速限制 单位：m/s
+  optional double speed_limit = 20 [default = 0.0];  // 0: no limit
+  // 轮速左前轮  单位：m/s
+  optional double wheel_speed_front_left = 21 [default = 0.0];
+  // 轮速右前轮  单位：m/s
+  optional double wheel_speed_front_right = 22 [default = 0.0];
+  // 轮速左后轮  单位：m/s
+  optional double wheel_speed_rear_left = 23 [default = 0.0];
+  // 轮速右后轮  单位：m/s
+  optional double wheel_speed_rear_right = 24 [default = 0.0];
+  // 总里程      单位:km   精度1
+  optional double total_trip = 25 [default = 0.0];
+  //驱动扭矩 n*m
+  optional double drive_torque = 26 [default = 0.0];
+  //驱动加速度 m/ss
+  optional double drive_acc = 27 [default = 0.0];
+  // 预留十个空位
+  //小计里程，每次开机后清零，精度0.01km
+    optional double sub_trip = 28 [default = 0.0];
+  // 人工介入信号，非0代表有人在尝试接管车辆 0:无介入，1：制动介入  2：转向介入  其他：混合介入
+  optional uint32 human_intervention = 29[default = 0];
+
+  // 钥匙挡位状态
+  optional KeyStatus power_key = 30 [default = KEY_OFF];
+  // true ok
+  optional OnOffStatus power_ok = 32 [default = INIT_OR_NO_DEVICE];
+  // true dc ok
+  optional DcDcStatus power_dc_state = 33 [default = DCDC_OFF];
+  // 小电瓶电压
+  optional double power_low_voltage = 34 [default = 0.0];
+  // 充电状态
+  optional ChargeStatus power_charge_state = 35 [default = NO_CHARGING];
+  // 充电是否连接
+  optional OnOffStatus power_charge_connect = 36 [default = INIT_OR_NO_DEVICE];
+  // 动力电池电压
+  optional double power_high_voltage = 37 [default = 0.0];
+  // 动力电池输出电流
+  optional double power_high_current = 38 [default = 0.0];
+  // 电池最高温度
+  optional double power_bms_max_temp = 39 [default = 0.0];
+  // 急停按钮状态
+  optional EstopStatus estop = 40 [default = ESTOP_STATUS_NO_STOP];
+
+  // 预留十个空位
+  // 电机驱动左前  单位：n*m
+  optional double drive_torque_front_left = 41 [default = 0.0];
+  // 电机驱动右前轮  单位：n*m
+  optional double drive_torque_front_right = 42 [default = 0.0];
+  // 电机驱动左后轮  单位：n*m
+  optional double drive_torque_rear_left = 43 [default = 0.0];
+  // 电机驱动右后轮  单位：n*m
+  optional double drive_torque_rear_right = 44 [default = 0.0];  
+
+  // 示廓灯
+  optional OnOffStatus bcm_position_lamp = 50 [default = INIT_OR_NO_DEVICE];
+  // 远光灯
+  optional OnOffStatus bcm_high_beam = 51 [default = INIT_OR_NO_DEVICE];
+  // 近光灯
+  optional OnOffStatus bcm_low_beam = 52 [default = INIT_OR_NO_DEVICE];
+  // 左转向灯
+  optional OnOffStatus bcm_turn_left = 53 [default = INIT_OR_NO_DEVICE];
+  // 右转向灯
+  optional OnOffStatus bcm_turn_right = 54 [default = INIT_OR_NO_DEVICE];
+  // 雾灯
+  optional OnOffStatus bcm_frog_lamp = 55 [default = INIT_OR_NO_DEVICE];
+  // 危险报警灯
+  optional OnOffStatus bcm_hazard_warning_lamp = 56
+      [default = INIT_OR_NO_DEVICE];
+  // 喇叭状态
+  optional OnOffStatus bcm_horn = 57 [default = INIT_OR_NO_DEVICE];
+  // 作业警示灯
+  optional OnOffStatus bcm_work_lamp = 58 [default = INIT_OR_NO_DEVICE];
+  // 雨刷洗涤状态
+  optional OnOffStatus bcm_wiper_washing = 59 [default = INIT_OR_NO_DEVICE];
+  // 雨刷状态
+  optional OnOffStatus bcm_wiper = 60 [default = INIT_OR_NO_DEVICE];
+  // SOC
+  optional double soc = 61 [default = 0.0];
+  //剩余电量（度，kw*h）
+  optional double dump_energy = 62 [default = 0.0];
+
+  // 预留十个空位
+  //水箱水位报警标识
+  optional uint32 water_lever_warning = 68[default = 0]; // 0无报警 1：低水位  2：高水位
+
+  // 上装作业模式  true 自动
+  optional OnOffStatus task_work_mode = 69 [default = INIT_OR_NO_DEVICE];
+  // 上装作业启动
+  optional OnOffStatus task_work_enable = 70 [default = INIT_OR_NO_DEVICE];
+  // 扫盘工作状态
+  optional SweepMode sweep = 71 [default = SWEEP_MODE_REVERT];
+  // 风机工作状态
+  optional FanMode fan = 72 [default = FAN_MODE_STEPLESS_FAN];
+  // 上装清洗状态
+  optional OnOffStatus garbage_washing = 73 [default = INIT_OR_NO_DEVICE];
+  // 上装后门状态
+  optional OnOffStatus back_door = 74 [default = INIT_OR_NO_DEVICE];
+  // 上装箱体运动状态
+  optional OnOffStatus garbage_status = 75 [default = INIT_OR_NO_DEVICE];
+  // 震尘
+  optional OnOffStatus vibrating_dust = 76 [default = INIT_OR_NO_DEVICE];
+  // 扫盘喷水开关
+  optional OnOffStatus sweep_spray = 77 [default = INIT_OR_NO_DEVICE];
+  // 垃圾储量
+  optional double garbage_percentage = 78 [default = 0.0];
+  // 水箱储量
+  optional double water_percentage = 79 [default = 0.0];
+
+  //上装洗车枪状态反馈
+  optional  OnOffStatus wcu_wash_gun = 80 [default = INIT_OR_NO_DEVICE];
+
+  //加水状态反馈
+  optional OnOffStatus water_addition_status = 81 [default = INIT_OR_NO_DEVICE];
+
+  //扫盘调试模式反馈
+  optional OnOffStatus debug_sweep_status = 82  [default = INIT_OR_NO_DEVICE];
+
+  //风机调试模式反馈
+  optional OnOffStatus debug_fan_status = 83  [default = INIT_OR_NO_DEVICE];
+
+  //上装吸嘴挡板状态反馈
+  optional OnOffStatus wcu_nozzle = 90 [default = INIT_OR_NO_DEVICE];
+
+  //箭头灯状态反馈
+  optional OnOffStatus wcu_arrow_light = 91 [default = INIT_OR_NO_DEVICE];
+
+//上装扫盘升降状态反馈
+optional OnOffStatus wcu_sweep_updown = 92 [default = INIT_OR_NO_DEVICE];
+
+//报警蜂鸣器状态反馈
+optional OnOffStatus wcu_buzzer = 93 [default = INIT_OR_NO_DEVICE];
+
+//上装一键卸料状态反馈
+optional OnOffStatus wcu_one_key_dump = 94 [default = INIT_OR_NO_DEVICE];
+
+//干湿扫模式状态反馈 on 干扫
+optional OnOffStatus wet_seep = 95 [default = INIT_OR_NO_DEVICE];
+
+//油泵控制器输入电压
+optional double wcu_oilpump_voltage_in = 100[default = 0.0];
+
+//油泵控制器输出电压
+optional double wcu_oilpump_voltage_out = 101[default = 0.0];
+//油泵控制器输出电流
+optional double wcu_oilpump_current_out = 102[default = 0.0];
+//油泵控制器状态
+optional int32 wcu_oilpump_status = 103[default = 0];
+
+//油泵转速
+optional double wcu_oilpump_speed = 104[default = 0.0];
+//油泵电机温度
+optional double wcu_oilpump_motor_temp = 105[default = 0.0];
+//油泵控制器温度
+optional double wcu_oilpump_controller_temp = 106[default = 0.0];
+//油泵控制器故障代码
+optional int32 wcu_oilpump_fault = 107[default = 0];
+
+//风机控制器输入电压
+optional double wcu_fan_voltage_in = 110[default = 0.0];
+//风机控制器输出电压
+optional double wcu_fan_voltage_out = 111[default = 0.0];
+//风机控制器输出电流
+optional double wcu_fan_current_out = 112[default = 0.0];
+//风机控制器状态
+optional double wcu_fan_control_status = 113[default = 0.0];
+//风机转速
+optional double wcu_fan_speed = 114[default = 0.0];
+//风机电机温度
+optional double wcu_fan_motor_temp = 115[default = 0.0];
+//风机控制器温度
+optional double wcu_fan_controller_temp = 116[default = 0.0];
+//风机控制器报警信息
+optional double wcu_fan_controller_alarm = 117[default = 0.0];
+//风机控制器故障代码
+optional double wcu_fan_controller_fault = 118[default = 0.0];
+
+//上装液压油位
+optional OnOffStatus wcu_oil_level_warning = 120 [default = INIT_OR_NO_DEVICE];
+//上装SOS按键  on:stop
+optional OnOffStatus wcu_sos_key = 121 [default = INIT_OR_NO_DEVICE];
+//空调PTC信号
+optional OnOffStatus wcu_ptc_status = 122 [default = INIT_OR_NO_DEVICE];
+//左侧门开关
+optional OnOffStatus wcu_left_door = 123 [default = INIT_OR_NO_DEVICE];
+
+//右侧门开关
+optional OnOffStatus wcu_right_door = 124 [default = INIT_OR_NO_DEVICE];
+//上装自动磨合状态反馈
+optional OnOffStatus wcu_auto_run_status = 125 [default = INIT_OR_NO_DEVICE];
+//上装自动磨合时间反馈
+optional double wcu_auto_run_time = 126 [default = 0.0];
+//上装自动磨合次数反馈
+optional int32 wcu_auto_run_count = 127 [default = 0];
+
+//上装吸嘴行程(暂无标准)
+optional int32 nozzle_updown_status = 128 [default = 0];
+
+optional RangeStatus wiper_range = 140[default = RANGE_0];
+
+optional HmiInput hmi_input = 150;
+optional TirePressure tire_pressure = 151;
+optional PowerInfo power_info = 152;
+optional OnOffStatus debug_sweep = 153;
+optional OnOffStatus debug_fan = 154;
+optional string vcu_version = 155;
+optional bytes debug_disp_info = 156;
+
+
+
+}

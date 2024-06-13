@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+package citibot.common.hdmap;
+
+import "common/message/map/map_geometry.proto";
+import "common/message/map/map_id.proto";
+import "common/message/map/map_lane.proto";
+
+// Station is a place designated to park a car.
+message Station {
+  enum Type {
+    DIRECT = 1;
+    HARBOR = 2;
+  };
+
+  optional Id id = 1;
+
+  optional Polygon polygon = 2;
+
+  repeated Polygon parking_zone = 3;
+
+  repeated LaneBoundaryType crossings_boundary_type = 4;
+
+  repeated Id overlap_id = 5;
+
+  required Type type = 100 [default = DIRECT];
+
+  optional string name = 101;
+}

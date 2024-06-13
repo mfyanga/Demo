@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+enum SchedulerRequestType {  
+    REQUEST_CACC_FORM = 0;//创建编队
+    REQUEST_CACC_JOIN = 1;//加入编队
+    REQUEST_CACC_LEAVE =2; //离开编队
+    REQUEST_CACC_DISBAND = 3; //解散编队
+    REQUEST_TIPS = 4;//提示
+}
+
+//调度请求前端确认,一般为请求前端交互,如请求同意入队，该任务同一时刻只能存在一个
+message SchedulerRequest {
+	optional SchedulerRequestType type = 1;//请求类型
+  optional string message = 2;//请求的内容,如”编队成员9527申请离开队伍,是否同意?“，“车辆故障,请求接管”
+  repeated string options = 3;//选项,如同意/拒绝,当无选项时前端只需确认,无需回复
+  optional int32 reply = 4 [default = 0]; //前端回复的结果,对应上面的options，默认填充0,选择第一个填充1,选择第二个填充2
+}
+
+

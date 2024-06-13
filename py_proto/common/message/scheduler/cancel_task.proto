@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+message CancelTaskProto {
+  optional uint64 token = 1; // 待取消任务token，必填
+  optional uint32 type = 2; // 待取消任务type,用来做补充
+} 
+

@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/header.proto"; 
+import "common/message/map/map.proto";
+import "common/message/perception/perception_obstacles.proto";
+
+//这个结构不再使用了
+message LocalDynamicMap {
+  optional citibot.common.message.Header header = 1;
+  optional PerceptionObstacles perception_obstacles = 2;  // An array of obstacles
+  optional citibot.common.hdmap.Map map = 3;
+}
+

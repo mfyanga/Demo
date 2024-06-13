@@ -1,0 +1,321 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/header.proto";
+import "common/message/chassis/chassis_util.proto";
+import "common/message/planning/simple_location.proto";
+
+// steer fault state
+enum SteeringState {
+  STEER_DYNAMIC_NORMAL = 0;
+  STEER_DYNAMIC_WARN = 1;
+  STEER_DYNAMIC_FAULT = 2;
+  STEER_NO_RESPONSE = 3;
+}
+// lon fault state
+enum ThrottleBrakeState {
+  THROTTLE_BRAKE_NORMAL = 0;
+  THROTTLE_BRAKE_ABNORMAL = 1;
+  THROTTLE_BRAKE_NORESPONSE = 2;
+}
+// lateral error fault state
+enum LateralFaultState {
+  LATERAL_NORMAL = 0;
+  LATERAL_STABLE_WARN = 1;
+  LATERAL_OSCILLAT_WARN = 2;
+  LATERAL_FAULT = 3;
+}
+// steer transfunction with no delay
+message FirstOrderTf{
+  // num/(s+den)
+  optional double first_order_num = 1 [default = 10.0];
+  optional double first_order_den = 2 [default = 10.0];
+}
+// steer transfunction
+message SteerTf{
+  optional FirstOrderTf first_order = 1;
+  optional double pure_delay = 2 [default = 0.18];
+}
+
+message SimpleLongitudinalDebug {
+  optional double filtered_acc = 1 [default = 0.0];
+  optional double station_error = 2 [default = 0.0];
+  optional double station_error_limited = 3 [default = 0.0];
+  optional double preview_station_error = 4 [default = 0.0];
+  optional double speed_reference = 5 [default = 0.0];
+  optional double speed_error = 6 [default = 0.0];
+  optional double speed_controller_input_limited = 7 [default = 0.0];
+  optional double preview_speed_reference = 8 [default = 0.0];
+  optional double preview_speed_error = 9 [default = 0.0];
+  optional double preview_acceleration_reference = 10 [default = 0.0];
+  optional double acceleration_cmd_closeloop = 11 [default = 0.0];
+  optional double acceleration_cmd = 12 [default = 0.0];
+  optional double acceleration_lookup = 13 [default = 0.0];
+  optional double speed_lookup = 14 [default = 0.0];
+  optional double calibration_value = 15 [default = 0.0];
+  optional double throttle_cmd = 16 [default = 0.0];
+  optional double brake_cmd = 17 [default = 0.0];
+  optional double slope_offset_compensation = 18 [default = 0.0];
+  optional double current_station = 19 [default = 0.0];
+  optional double path_remain = 20 [default = 0.0];
+  optional double auto_model_time = 21 [default = 0.0];
+  optional double gear_position = 22 [default = 0.0];
+  optional double current_acc = 23 [default = 0.0];
+  optional double lon_controller_status = 24 [default = 0.0];
+  optional double common_stop_time = 25 [default = 0.0];
+  optional double common_stop_s = 26 [default = 0.0];
+  optional double matched_lon_station = 27 [default = 0.0];
+  optional double matched_lon_curvature = 28 [default = 0.0];
+  optional double preview_lon_station = 29 [default = 0.0];
+  optional double preview_lon_curvature = 30 [default = 0.0];
+  optional double reference_lon_curvature = 31 [default = 0.0];
+  optional bool is_full_stop = 32 [default = false];
+  optional bool is_common_stop = 33 [default = false];
+  optional double station_reference = 34 [default = 0.0];
+  optional double pitch_angle = 35 [default = 0.0];
+  optional double reference_position_x = 36 [default = 0.0];
+  optional double reference_position_y = 37 [default = 0.0];
+  optional double reference_position_theta = 38 [default = 0.0];
+}
+
+message SimpleLateralDebug {
+  optional double lateral_error = 1 [default = 0.0];
+  optional double ref_heading = 2 [default = 0.0];
+  optional double heading = 3 [default = 0.0];
+  optional double heading_error = 4 [default = 0.0];
+  optional double heading_error_rate = 5 [default = 0.0];
+  optional double lateral_error_rate = 6 [default = 0.0];
+  optional double curvature = 7 [default = 0.0];
+  optional double steer_angle = 8 [default = 0.0];
+  optional double steer_angle_feedforward = 9 [default = 0.0];
+  optional double steer_angle_lateral_contribution = 10 [default = 0.0];
+  optional double steer_angle_lateral_rate_contribution = 11 [default = 0.0];
+  optional double steer_angle_heading_contribution = 12 [default = 0.0];
+  optional double steer_angle_heading_rate_contribution = 13 [default = 0.0];
+  optional double steer_angle_feedback = 14 [default = 0.0];
+  optional double steering_position = 15 [default = 0.0];
+  optional double ref_speed = 16 [default = 0.0];
+  optional double steer_angle_limited = 17 [default = 0.0];
+  optional double steer_angle_integral = 18 [default = 0.0];
+  optional double steer_angle_correct = 19 [default = 0.0];
+  optional double steer_angle_roll_compensate = 20 [default = 0.0];
+  optional double ref_x = 21 [default = 0.0];
+  optional double ref_y = 22 [default = 0.0];
+  optional double real_speed = 23 [default = 0.0];
+  optional double matrix_k1 = 24 [default = 0.0];
+  optional double matrix_k2 = 25 [default = 0.0];
+  optional double matrix_k3 = 26 [default = 0.0];
+  optional double matrix_k4 = 27 [default = 0.0];
+  optional double matched_lat_station = 28 [default = 0.0];
+  optional double matched_lat_speed = 29 [default = 0.0];
+  optional double matched_lat_acceleration = 30 [default = 0.0];
+  optional double curvature_preview = 31 [default = 0.0];
+  optional LateralFWSOPCDebug simple_fws_opc_lat_debug = 32;
+  optional LateralFWSLQRDebug simple_fws_lqr_lat_debug = 33;
+  optional Lateral4WSLQRDebug simple_4ws_lqr_lat_debug = 34;
+  optional Lateral4WSPPCDebug simple_4ws_ppc_lat_debug = 35;
+}
+
+message SimpleMPCDebug {
+  repeated double sol_state_x = 1;
+  repeated double sol_state_y = 2;
+  repeated double sol_state_phi = 3;
+  repeated double sol_state_v = 4;
+  repeated double sol_control_steer = 5;
+  repeated double sol_control_a = 6;
+  optional double steer_cmd = 7 [default = 0];
+  optional double a_cmd = 8 [default = 0];
+  repeated double sol_state_t = 9;
+}
+
+message LateralFWSOPCDebug {
+  optional double front_steer_fws_opc = 1[default = 0.0];
+  optional double rear_steer_fws_opc = 2[default = 0.0];
+  optional double matrix_ki = 3 [default = 0.0];
+  optional double matrix_k1 = 4 [default = 0.0];
+  optional double matrix_k2 = 5 [default = 0.0];
+  optional double matrix_k3 = 6 [default = 0.0];
+  optional double matrix_k4 = 7 [default = 0.0];
+  optional double matrix_kl = 8 [default = 0.0];
+  optional double matrix_kd = 9 [default = 0.0];
+  optional double matrix_kp = 10 [default = 0.0];
+  optional double steer_angle_integral = 11 [default = 0.0];
+  optional double steer_angle_lat_err = 12 [default = 0.0];
+  optional double steer_angle_lat_err_rate = 13 [default = 0.0];
+  optional double steer_angle_heading_err = 14 [default = 0.0];
+  optional double steer_angle_heading_err_rate = 15 [default = 0.0];
+  optional double steer_angle_feedback = 16 [default = 0.0];
+  optional double steer_angle_lag = 17 [default = 0.0];
+  optional double steer_angle_delay = 18 [default = 0.0];
+  optional double steer_angle_feedforward = 19 [default = 0.0];
+}
+
+message LateralFWSLQRDebug {
+  optional double front_steer_fws_lqr = 1[default = 0.0];
+  optional double rear_steer_fws_lqr = 2[default = 0.0];
+  optional double matrix_ki = 3 [default = 0.0];
+  optional double matrix_k1 = 4 [default = 0.0];
+  optional double matrix_k2 = 5 [default = 0.0];
+  optional double matrix_k3 = 6 [default = 0.0];
+  optional double matrix_k4 = 7 [default = 0.0];
+  optional double matrix_kp = 8 [default = 0.0];
+  optional double steer_angle_integral = 9 [default = 0.0];
+  optional double steer_angle_lat_err = 10 [default = 0.0];
+  optional double steer_angle_lat_err_rate = 11 [default = 0.0];
+  optional double steer_angle_heading_err = 12 [default = 0.0];
+  optional double steer_angle_heading_err_rate = 13 [default = 0.0];
+  optional double steer_angle_feedback = 14 [default = 0.0];
+  optional double steer_angle_leadlag = 15 [default = 0.0];
+  optional double steer_angle_feedforward = 16 [default = 0.0];
+  optional double steer_angle_roll = 17 [default = 0.0];
+}
+
+message Lateral4WSLQRDebug {
+  optional double front_steer_4ws_lqr = 1[default = 0.0];
+  optional double rear_steer_4ws_lqr = 2[default = 0.0];
+  optional double matrix_kf1 = 3 [default = 0.0];
+  optional double matrix_kf2 = 4 [default = 0.0];
+  optional double matrix_kf3 = 5 [default = 0.0];
+  optional double matrix_kf4 = 6 [default = 0.0];
+  optional double matrix_kr1 = 7 [default = 0.0];
+  optional double matrix_kr2 = 8 [default = 0.0];
+  optional double matrix_kr3 = 9 [default = 0.0];
+  optional double matrix_kr4 = 10 [default = 0.0];
+  optional double front_steer_angle_integral = 11 [default = 0.0];
+  optional double front_steer_angle_lat_err = 12 [default = 0.0];
+  optional double front_steer_angle_lat_err_rate = 13 [default = 0.0];
+  optional double front_steer_angle_heading_err = 14 [default = 0.0];
+  optional double front_steer_angle_heading_err_rate = 15 [default = 0.0];
+  optional double front_steer_angle_feedback = 16 [default = 0.0];
+  optional double front_steer_angle_feedforward = 17 [default = 0.0];
+  optional double front_steer_angle_roll = 18 [default = 0.0];
+  optional double rear_steer_angle_integral = 19 [default = 0.0];
+  optional double rear_steer_angle_lat_err = 20 [default = 0.0];
+  optional double rear_steer_angle_lat_err_rate = 21 [default = 0.0];
+  optional double rear_steer_angle_heading_err = 22 [default = 0.0];
+  optional double rear_steer_angle_heading_err_rate = 23 [default = 0.0];
+  optional double rear_steer_angle_feedback = 24 [default = 0.0];
+  optional double rear_steer_angle_feedforward = 25 [default = 0.0];
+  optional double rear_steer_angle_roll = 26 [default = 0.0];
+}
+
+message Lateral4WSPPCDebug {
+  optional double front_steer_4ws_ppc = 1[default = 0.0];
+  optional double rear_steer_4ws_ppc = 2[default = 0.0];
+  optional double preview_distance_first = 3[default = 0.0];
+  optional double preview_distance_second = 4[default = 0.0];
+  optional double kappa_integral = 5[default = 0.0];
+  optional double kappa_preview_method = 6[default = 0.0];
+  optional double kappa_leadlag = 7[default = 0.0];
+  optional double steer_cmd_refer = 8[default = 0.0];
+  optional double heading_error = 9[default = 0.0];
+  optional double lateral_error = 10[default = 0.0];
+}
+
+message ControlDebug {
+  optional SimpleLongitudinalDebug simple_lon_debug = 1;
+  optional SimpleLateralDebug simple_lat_debug = 2;
+  optional SimpleMPCDebug simple_mpc_debug = 3;
+}
+
+// 控制指令下发
+message ControlCmd {
+  // 消息头
+  optional Header header = 1;
+  // 驾驶模式请求，转发功能管理请求
+  optional DrivingRequest driving_request = 2;
+
+  // 速度模式，默认为开度模式，下发油门刹车
+  optional ThrottleMode throttle_mode = 3 [default = THROTTLE_MODE_PEDAL];
+
+  // 刹车，单位百分比
+  optional double brake = 4 [default = 0.0];
+
+  // 油门，单位百分比
+  optional double throttle = 5 [default = 0.0];
+
+  // 目标加速度，加速度模式下生效
+  optional double target_acceleration = 6 [default = 0.0];
+
+  // 目标速度，速度模式下生效
+  optional double target_speed = 7 [default = 0.0];
+
+  // 转向模式
+  optional SteeringMode steering_mode = 8
+      [default = STEERING_MODE_FRONT_ACKERMAN];
+
+  // 前轮方向盘角度，单位百分比
+  optional double front_steering = 9 [default = 0.0];
+
+  // 后轮方向盘角度，单位度百分比
+  optional double back_steering = 10 [default = 0.0];
+
+  // 方向盘转向率 百分比/s
+  optional double steering_rate = 11 [default = 40.0];
+
+  // 挡位
+  optional GearMode gear = 12 [default = NO_USE];
+
+  // 手刹
+  optional EpbRequest epb_request = 13 [default = EPB_REQUEST_NO];
+
+  // 油门实际执行开度  0~100
+  optional double throttle_pedal = 14 [default = 0.0];
+
+  // 制动实际执行开度  0~100
+  optional double brake_pedal = 15 [default = 0.0];
+
+  // 前轮转角
+  optional double steering_front_angle = 16 [default = 0.0];
+
+  // 后轮转角
+  optional double steering_rear_angle = 17 [default = 0.0];
+
+  // 手刹状态
+  optional EpbStatus epb_state = 18 [default = EPB_STATUS_UNKNOWN];
+
+  // 挡位
+  optional GearMode gear_state = 19 [default = NO_USE];
+
+  // 底盘运行模式
+  optional ChassisMode chassis_mode = 20 [default = CHASSIS_MODE_INIT];
+
+  // 底盘车速
+  optional double chassis_speed_mps = 21 [default = 0.0];
+
+  // 底盘驱动模式反馈
+  optional ThrottleMode chassis_throttle_mode = 22 [default = THROTTLE_MODE_PEDAL];
+
+  // 底盘方向盘模式反馈
+  optional SteeringMode chassis_steering_mode = 23[default = STEERING_MODE_FRONT_ACKERMAN];
+
+  // 车重
+  optional double mass_value = 24 [default = 760.0];
+
+  // 上一帧命令信息
+  optional double last_front_steering = 25 [default = 0.0];
+  optional double last_back_steering = 26 [default = 0.0];
+  optional double last_brake = 27 [default = 0.0];
+  optional double last_throttle = 28 [default = 0.0];
+
+  // 控制调试信息
+  optional ControlDebug debug = 30;
+
+  // 规划绝对定位信息
+  optional SimpleLocation local_position_planning = 35;
+  // 控制绝对定位信息
+  optional SimpleLocation local_position_control = 36;
+  // 绝对误差信息
+  optional double abs_lon_err = 37 [default = 0.0];
+  optional double abs_lat_err = 38 [default = 0.0];
+  optional double abs_heading_err = 39 [default = 0.0];
+
+  // 故障辨识信息
+  optional SteeringState fsteering_state = 40 [default = STEER_DYNAMIC_NORMAL];
+  optional SteeringState rsteering_state = 41 [default = STEER_DYNAMIC_NORMAL];
+  optional SteerTf fsteer_tf_current = 42;
+  optional SteerTf rsteer_tf_current = 43;
+  optional ThrottleBrakeState throttle_brake_state = 44 [default = THROTTLE_BRAKE_NORMAL];
+  optional LateralFaultState lateral_fault_state = 45 [default = LATERAL_NORMAL];
+}

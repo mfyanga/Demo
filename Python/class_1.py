@@ -1,10 +1,11 @@
 #!/usr/bin/python
 #coding=utf-8
+
 print "Hellow world."
 print "大家好！"
 
 #1.标识符：以字符、数字、下划线组成，区分大小写,但不能以数值开头
-# _var:不能直截止访问的类属性，需要专门的接口访问，不能采用 from xx import * 导入
+# _var:不能直接访问的类属性，需要专门的接口访问，不能采用 from xx import * 导入
 #__var:表示类的私有成员
 #__var__:特殊方法专用的标识符，如类的构造函数__init__()
 if True:

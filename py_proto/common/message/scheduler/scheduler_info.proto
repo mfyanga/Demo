@@ -1,0 +1,84 @@
+syntax = "proto2";
+
+package citibot.common.message;
+import "common/message/routing/routing.proto";
+// import "common/message/dispatch/bp_network.proto";
+import "common/message/planning/planning_status.proto";
+//import "common/message/dynamic_parmeters.proto";
+
+
+
+
+message TaskToken{
+    optional uint64 routing_token = 1; // 全局路线token，没有选路时填充0，用来判断是否路线已选
+    optional uint64 navigation_token = 12; // 导航token，开始导航后填充，没有导航时填充0，用来判断是否已经进入导航
+    optional uint64 auto_start_token = 13; // 启动自动驾驶token，启动自动驾驶后填充，非自动驾驶时填充0，用来判断是否已经进入自动驾驶
+}
+message TaskEnable{
+    optional bool routing = 1; // 路线请求使能
+    optional bool navigation_start = 2; // 开始导航使能
+    optional bool navigation_end = 3; // 结束导航使能
+    optional bool auto_start = 4; // 启动自动驾驶使能
+    optional bool auto_exit = 5; // 结束自动驾驶使能
+    optional bool scheduler_decision = 6; // 调度决策使能
+    optional bool map_update = 7; // 地图更新使能
+    optional bool charging = 8; // 充电使能
+    optional bool stop = 9; // 停车使能
+}
+
+
+message RoutingInfo{
+  optional string route_name = 1;
+  message WayPoint{
+    optional double x = 1 [default = nan];
+    optional double y = 2 [default = nan];
+    optional double z = 3 [default = nan];
+  }
+  repeated WayPoint way_point = 2;
+}
+
+message MdcVersion{
+  optional string system_version = 1;
+  optional string mdc_firmware_version = 2;
+  optional string deploy_version = 3;
+  optional string mini_version = 4;
+  optional string dcu_version = 5;
+  optional string map_branch = 6;
+  optional string map_info_ver = 7;
+  optional string localization_map_ver = 8;
+  // 松鼠系统的各个功能模块版本
+  optional string modules_version = 20;
+}
+
+message SchedulerInfoProto {
+  optional uint64 update_time = 1; // 更新时间
+  //optional SystemWorkStatus system_work_status =2; // 系统工作状态
+  //optional WorkMode work_mode = 3 [default = STANDARD];
+  // optional citibot.v2x.V2xMessage v2x_message = 5; //v2x消息（暂可不填）
+  // oneof routing_data{
+  //   citibot.common.routing.RoutingRequest routing_request= 6; 
+  //   citibot.common.dispatch.BPRouting bp_routing = 7;
+  // } // 全局路线的内容，方便连接断开恢复，离线数据使用
+  optional uint64 planning_status_time = 8; // 更新时间
+  optional citibot.common.message.PlanningStatus planning_status = 9; // 规划输出车辆信息
+  // optional citibot.common.CaccScenarioMsg cacc_scenario_msg = 10;//编队信息
+  //optional DynamicParmetersProto dynamic_parmeters = 11;//动态参数的全部生效配置，方便连接断开恢复，离线数据使用
+  
+  optional TaskToken task_token = 13;//主要任务的token
+  optional TaskEnable task_enable = 14;//任务是否支持下发的使能
+  //按最严重故障定义，0-无故障，1-轻微故障，可忽略，2-中等故障，影响自动驾驶，需限速等功能抑制，3-致命故障，需减速停车，限制自动驾驶
+  optional int32 FailureLevel = 15;
+  optional string map_name = 16; // 地图名称
+  optional int32 autopilot_pre_stage = 17;//自动驾驶前置阶段
+
+  // ###############################新版本dispatch发布的消息###############################
+  optional string vehicle_name = 12; // 车辆名称
+  optional MdcVersion mdc_version = 100;  // mdc相关版本
+  optional RoutingInfo route_info = 101;  // 路线信息
+
+  // optional citibot.common.CaccPublish cacc_publish = 200; // 编队相关广播
+  // ###############################新版本dispatch发布的消息###############################
+
+
+} 
+

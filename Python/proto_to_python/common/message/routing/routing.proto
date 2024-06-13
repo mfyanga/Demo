@@ -1,0 +1,149 @@
+syntax = "proto2";
+
+package  citibot.common.routing;
+
+import "common/message/header.proto";
+import "common/message/geometry.proto";
+import "common/message/error_code.proto";
+import "common/message/map/map_parking_space.proto";
+
+// 用于更新被选中的车位
+message SelectParkingSpace{
+  repeated string selected_parking_space_ids = 1;
+}
+
+message CandidateParkingSpace{
+  // 候选车位信息
+  repeated citibot.common.hdmap.ParkingSpace candidate_parking_space = 1;
+  // 被选中的车位，可以多选
+  repeated string selected_parking_space_ids = 2;
+}
+
+message LaneWaypoint {
+  optional string id = 1;
+  optional double s = 2;
+  optional citibot.common.message.PointENU pose = 3;
+}
+
+message LaneSegment {
+    optional string id = 1;
+    optional double start_s = 2;
+    optional double end_s = 3;
+    optional string segment_id = 4;
+    optional string predecessor_id = 5;
+    optional string successor_id = 6;
+  }
+
+message ParkingInfo {
+    optional string parking_space_id = 1;
+    optional citibot.common.message.PointENU parking_point = 2;
+    optional string station_id = 10;
+  }
+
+message RoutingRequest {
+  optional citibot.common.message.Header header = 1;
+  // at least two points. The first is start point, the end is final point.
+  // The routing must go through each point in waypoint.
+  repeated LaneWaypoint waypoint = 2;
+  repeated LaneSegment blacklisted_lane = 3;
+  repeated bytes blacklisted_road = 4;
+  optional bool broadcast = 5 [default = true];
+  optional citibot.common.hdmap.ParkingSpace parking_space = 6 [deprecated = true];
+  repeated ParkingInfo parking_info = 7;
+  optional string routetitle = 8;//路线名称
+  // 是否为循环路线
+  optional bool is_circular_route = 9;
+}
+
+//途径点，支持地图元素id和坐标两种方式，同时存在时优先使用id
+message CitiWaypoint {
+  optional string id = 1;//地图元素id，表示经过该区域
+  optional citibot.common.message.PointLLH position = 2;//途经点坐标
+}
+
+//终点
+message CitiDestination{
+  enum Type{
+    // 坐标点
+    POSIITION = 1;
+    // 区域
+    REGION = 2;
+    // 车位
+    PARKING_SPACE = 3;
+  };
+  //目标终点类型
+  required Type type = 1;
+  //目标终点对应的地图元素id，如果是区域或者车位必须填充
+  optional string id = 2;
+  //终点坐标，如果类型为POSIITION时必须填充
+  optional citibot.common.message.PointLLH position = 3;
+}
+
+//导航类型
+enum CitiRoutingType {
+    MOVE = 1;//这种类型只需要到达区域起点边缘
+    CLEAN = 2;//这种类型需要遍历区域
+};
+
+message CitiRouting {
+  optional citibot.common.message.Header header = 1;
+  //路线名称
+  optional string routetitle = 2;
+  //导航类型
+  optional CitiRoutingType type = 3;
+  //路线起点，一般需填充，不填充时为车辆当前位置
+  optional citibot.common.message.PointLLH start = 4;
+  //路线途经点（区域）
+  repeated CitiWaypoint waypoint = 5;
+  //路线终点，不填充时为途经点最后一点
+  optional CitiDestination destination = 6;
+  //初始朝向
+  optional double start_heading = 7;
+  //断点续扫id，上次取消任务的operation_id,如果有则表示需要回到上次取消任务的断点
+  optional string breakpoint_id = 8;
+}
+
+message Measurement {
+  // total mileage
+  optional double distance = 1;
+  // distance traveled by vehile
+  optional double travelled_distance = 10;
+  // 耗时
+  optional double cost_time = 11;
+}
+
+enum ChangeLaneType {
+    FORWARD = 0;
+    LEFT = 1;
+    RIGHT = 2;
+};
+
+
+message Passage {
+   repeated LaneSegment segment = 1;
+   optional bool can_exit = 2;
+   optional ChangeLaneType change_lane_type = 3 [default = FORWARD];
+   optional string predecessor_passage_id = 10;
+   optional string successor_passage_id = 11;
+   optional string left_passage_id = 12;
+   optional string right_passage_id = 13;
+}
+
+message RoadSegment {
+  optional string id = 1;
+  repeated Passage passage = 2;
+}
+
+message RoutingResponse {
+  optional citibot.common.message.Header header = 1;
+  repeated RoadSegment road = 2;
+  optional Measurement measurement = 3;
+  optional RoutingRequest routing_request = 4;
+  // the map version which is used to build road graph
+  optional bytes map_version = 5;
+  optional citibot.common.StatusPb status = 6;
+  // 导航指定车位，不可选择
+  repeated citibot.common.hdmap.ParkingSpace parking_spaces = 7;
+  // 候选车位，可修改被选中的车位
+  optional CandidateParkingSpace candidate_parking_spaces = 8;
+}

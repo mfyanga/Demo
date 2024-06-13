@@ -1,0 +1,385 @@
+syntax = "proto2";
+
+package citibot.common.message.deprecated;
+
+import "common/message/scheduler/driving_direction.proto";
+import "common/message/scheduler/door_control.proto";
+import "common/message/thirdparty/thirdparty_sensor.proto";
+
+//  warning deprecated
+enum HornStatus {
+  HORN_OFF = 0;
+  HORN_ON = 1;
+};
+
+enum DoorOpenStatus {
+  IS_OPEN = 0;
+  IS_CLOSE = 1;
+  NOT_ALL_CLOSE = 2;
+};
+
+enum WiperStatus {
+  WIPER_NONE = 0;
+  LOW = 1;
+  MEDIUM = 2;
+  HIGH = 3;
+};
+
+enum DriveGearPosition {
+  GEAR_POSITION_NONE = 0;
+  D1 = 1;
+  D2 = 2;
+  D3 = 3;
+  D4 = 4;
+  D5 = 5;
+  D6 = 6;
+  D7 = 7;
+  D8 = 8;
+  D9 = 9;
+  D10 = 10;
+  D11 = 11;
+  D12 = 12;
+  D13 = 13;
+  D14 = 14;
+  D15 = 15;
+  D16 = 16;
+};
+
+enum GearBoxMode {
+  AUTO_MODE = 0;
+  MANUAL_MODE = 1;
+};
+
+enum EngageAdvice {
+  UNKNOWN = 0;
+  DISALLOW_ENGAGE = 1;
+  READY_TO_ENGAGE = 2;
+  KEEP_ENGAGED = 3;
+  PREPARE_DISENGAGE = 4;
+};
+
+enum GearLocation {
+  GEAR_NEUTAL = 0;
+  GEAR_DRIVE = 1;
+  GEAR_REVERSE = 2;
+  GEAR_PARKING = 3;
+  GEAR_LOW = 4;
+  GEAR_INVALID = 5;
+  GEAR_NONE = 6;
+};
+
+enum DrivingMode {
+  COMPLETE_MANUAL = 0;
+  COMPLETE_AUTO_DRIVE = 1;
+  AUTO_SPEED_ONLY = 2;
+  AUTO_STEER_ONLY = 3;
+  EMERGENCY_MODE = 4;
+  REMOTE_DRIVE = 5;
+  EXIT_AUTO_DRIVE = 6;
+};
+
+enum ChassisErrorCode {
+  NO_ERROR = 0;
+  CMD_NOT_IN_PERIOD = 1;
+  CHASSIS_ERROR = 2;
+  MANUAL_INTERVENTION = 3;
+  CHASSIS_CAN_NOT_IN_PERIOD = 4;
+  UNKNOWN_ERROR = 5;
+};
+
+enum TurnLightStatus {
+  TURN_NONE = 0;
+  TURN_LEFT = 1;
+  TURN_RIGHT = 2;
+  EMERGENCY_FLASHE = 3;
+};
+
+enum BeamStatus {
+  BEAM_OFF = 0;
+  LOW_BEAM = 1;
+  HIGH_BEAM = 2;
+};
+
+enum TurnSignalSwitchStatus {
+  TURN_SIGNAL_NONE = 0;
+  TURN_SIGNAL_LEFT = 1;
+  TURN_SIGNAL_RIGHT = 2;
+};
+
+enum EmergencyStopFlag {
+  INVALID = 0;
+  EFFECTIVE = 1;
+};
+
+enum EpbState {
+  EPB_STATE_DISABLE = 0;
+  EPB_STATE_ACTIVE = 1;
+  EPB_STATE_RELEASE = 2;
+  EPB_STATE_ERROR = 3;
+};
+
+enum EpbAHState {
+  EPB_NOT_AVAILABLE = 0;
+  EPB_ACTIVE = 1;
+  EPB_INACTIVE = 2;
+  EPB_ERROR = 3;
+};
+
+enum AEBStatus {
+  AEB_STATUS_OFF = 0;
+  AEB_STATUS__ERROR = 1;
+  AEB_STATUS_ON = 2;
+  AEB_STATUS_WARNING = 3;
+  AEB_STATUS_HALF_BRAKE = 4;
+  AEB_STATUS_EMERGENCY_BRAKE = 5;
+};
+
+enum DumpState {
+  DUMP_INVALID = 0;
+  UNLOADING = 1;
+  UNLOADING_COMPLETED = 2;
+  DUMP_ERROR = 3;
+};
+
+enum ChargeState {
+  CHARGE_STATE_NO = 0;
+  CHARGE_STATE_CHARGING = 1;
+  CHARGE_STATE_FINISHED = 2;
+  CHARGE_STATE_TERMINATED = 3;
+};
+
+enum RunStatus {
+  RUN_STATUS_NONE = 0;
+  RUN_STATUS_INITIALIZED = 1;
+  RUN_STATUS_POWERED = 2;
+  RUN_STATUS_COMPLETE_MANUAL = 3;
+  RUN_STATUS_REMOTE_DRIVE = 4;
+  RUN_STATUS_COMPLETE_AUTO_DRIVE = 5;
+};
+
+enum ADSReset {
+  NONE = 0;
+  MDC_RESET = 1;
+  FRONT_PERCEPTION_RESET = 2;
+  LEFT_PERCEPTION_RESET = 3;
+  RIGHT_PERCEPTION_RESET = 4;
+  REAR_PERCEPTION_RESET = 5;
+  INTEGRATED_NAVIGATION_RESET = 6;
+};
+
+enum LiftStatus {
+  LIFT_STATUS_INVALID = 0;
+  LIFT_STATUS_ASCENDING = 1;
+  LIFT_STATUS_DESCENDING = 2;
+  LIFT_STATUS_FULL_ASCENDING = 3;
+  LIFT_STATUS_FULL_DESCENDING = 4;
+  LIFT_STATUS_SUSPENDED = 5;
+  LIFT_STATUS_ERROR = 6;
+};
+
+// 缓速器控制指令
+enum Retarder {
+  OFF = 0;
+  ON = 1;
+}
+
+enum AngleQualifactor {
+  NOT_DIAGNOSED = 0;
+  FULLY_TRUSTED = 11;
+  TRUSTED = 22;
+  USE_WITH_CAUTION = 33;
+  TOTALLY_UNTRUSTWORTHY = 44;
+}
+
+// 整车运行状态
+enum VehicleRunState {
+  INITIAL_STATE = 0;          // 初始状态
+  CHASSIS_DRIVE_CONTROL = 1;  // 底盘驱动控制
+  BODYWORK_CONTROL = 2;       // 上装控制
+  ERROR = 3;                  // 错误
+}
+
+enum DoorStatus {
+  OTHER = 0;
+  OPENED = 1;
+  CLOSED = 2;
+  PAUSE = 3;
+  OPENNING = 4;
+  CLOSING = 5;
+}
+
+enum VehicleLoadStatus {
+  EMPTY = 0;        // 空载
+  LOADED = 1;       // 满载
+  HALF_LOADED = 2;  // 半载
+}
+
+message SimpleMPCDebug {
+  repeated double sol_state_x = 1;
+  repeated double sol_state_y = 2;
+  repeated double sol_state_phi = 3;
+  repeated double sol_state_v = 4;
+  repeated double sol_control_steer = 5;
+  repeated double sol_control_a = 6;
+  optional double steer_cmd = 7 [default = 0];
+  optional double a_cmd = 8 [default = 0];
+  repeated double sol_state_t = 9;
+}
+
+// ControlCmd消息的proto配置
+message ControlCmdProto {
+  optional Retarder retarder_status = 1;  // 缓速器状态
+  optional SimpleCaccLongitudinalDebug simple_cacc_lon_debug = 2;  // 编队debug
+  optional VehicleDrivingDirection driving_direction_cmd =
+      3;                                // 车辆行驶方向指令
+  optional double steering_b = 4;       // 车桥B转角度数
+  optional double steering_rate_b = 5;  // 车桥B转角速率
+  optional VehicleLoadStatus vehicle_load_status = 6
+      [default = EMPTY];                           // 车辆载重
+  optional double vehicle_load = 7 [default = 0];  // 车辆载重吨数
+  optional SimpleMPCDebug simple_mpc_debug = 8;
+}
+
+message SimpleCaccLongitudinalDebug {
+  optional double station_reference = 1 [default = 0];
+  optional double station_error = 2 [default = 0];
+  optional double station_error_limited = 3 [default = 0];
+  optional double preview_station_error = 4 [default = 0];
+  optional double speed_reference = 5 [default = 0];
+  optional double speed_error = 6 [default = 0];
+  optional double speed_controller_input_limited = 7 [default = 0];
+  optional double preview_speed_reference = 8 [default = 0];
+  optional double preview_speed_error = 9 [default = 0];
+  optional double preview_acceleration_reference = 10 [default = 0];
+  optional double acceleration_cmd_closeloop = 11 [default = 0];
+  optional double acceleration_cmd = 12 [default = 0];
+  optional double acceleration_lookup = 13 [default = 0];
+  optional double speed_lookup = 14 [default = 0];
+  optional double calibration_value = 15 [default = 0];
+  optional double throttle_cmd = 16 [default = 0];
+  optional double brake_cmd = 17 [default = 0];
+  optional bool is_full_stop = 18;
+  optional double slope_offset_compensation = 19 [default = 0];
+  optional double current_station = 20 [default = 0];
+  optional double path_remain = 21 [default = 0];
+  optional double auto_model_time = 22 [default = 0];
+  optional double gear_position = 23 [default = 0];
+  optional bool is_common_stop = 24;
+  optional double current_acc = 25 [default = 0];
+  optional double filtered_acc = 26 [default = 0];
+  optional double lon_controller_status = 27 [default = 0];
+  optional double common_stop_time = 28 [default = 0];
+  optional double common_stop_s = 29 [default = 0];
+  optional double matched_lon_station = 30 [default = 0];
+  optional double matched_lon_curvature = 31 [default = 0];
+  optional double preview_lon_station = 32 [default = 0];
+  optional double preview_lon_curvature = 33 [default = 0];
+  optional double reference_lon_curvature = 34 [default = 0];
+  optional double gear_location = 35 [default = 0];
+  optional double utm_x = 36 [default = 0.0];
+  optional double utm_y = 37 [default = 0.0];
+  optional double front_utm_x = 38;
+  optional double front_utm_y = 39;
+  optional double station_error_integral = 40;
+  optional double corrected_leadlag_compensation = 41;
+  optional double calculate_acceleration_cmd = 42;
+  optional double obstacle_station = 43;
+  optional double lead_car_speed = 44;
+  optional double front_car_speed = 45;
+  optional double front_car_speed_error = 46;
+  optional double lead_car_speed_error = 47;
+  optional double front_car_acceleration = 48;
+  optional double lead_car_acceleration = 49;
+  optional double car_speed = 50;
+  optional double cacc_acceleration_cmd = 51;
+  optional bool perception_message_update = 52 [default = false];
+  optional bool obu_message_update = 53 [default = false];
+  optional double obstacle_acceleration = 54;
+  optional double obstacle_speed = 55;
+  optional double obstacle_station_error = 56;
+  optional double obstacle_front_speed = 57;
+  optional double obstacle_lead_speed = 58;
+  optional double obstacle_station_error_limited = 59;
+  optional double obstacle_front_speed_error = 60;
+  optional double obstacle_lead_speed_error = 61;
+  optional double obstacle_front_acceleration = 62;
+  optional double obstacle_lead_acceleration = 63;
+  optional double obu_station_error = 64;
+  optional double obu_front_car_speed = 65;
+  optional double obu_lead_car_speed = 66;
+  optional double obu_station_error_limited = 67;
+  optional double obu_front_car_speed_error = 68;
+  optional double obu_lead_car_speed_error = 79;
+  optional double obu_front_car_acceleration = 70;
+  optional double obu_lead_car_acceleration = 71;
+  optional double obu_car_station = 72;
+}
+
+// 车门状态
+message DoorInfo {
+  optional DoorID door_id = 1;
+  optional DoorStatus status = 2;
+}
+
+message ChargeResponse {
+  enum ChargeStatus {
+    NO = 0;          // 未充电
+    CHARGING = 1;    // 正在充电
+    FINISHED = 2;    // 充电完成
+    TERMINATED = 3;  // 充电终止
+  }
+  optional ChargeStatus status = 1;
+  optional int32 error_code =
+      2;  // 错误状态，关联充电相关错误  0为无错误 其他值待定
+}
+
+message WheelSpeed {
+  optional double steer_alex_left = 1;
+  optional double steer_alex_right = 2;
+  optional double drive_alex_left = 3;
+  optional double drive_alex_right = 4;
+}
+
+message EmergencyStopReason {
+  optional bool is_emergency_button_trigger = 1;  // 紧急停车按钮触发
+  optional bool is_remote_control_trigger = 2;    // 遥控急停触发
+  optional bool is_auto_emergency_braking_trigger = 3;  // AEB触发
+  optional bool is_anticollision_strip_trigger = 4;     // 安全触边触发
+}
+
+// ChassisInfo消息的proto配置
+message ChassisInfoProto {
+  enum DcuDrivingMode {
+    INIT = 0;               // 初始化模式
+    STANDBY_PREPARING = 1;  // 待机准备模式
+    STANDBY = 2;            // 待机模式
+    AUTO_PILOT = 3;         // 自动驾驶模式
+    TELE = 4;               // 远程驾驶模式
+    FREE = 5;               // 自由模式
+    REMOTE = 6;             // 遥控模式
+    CHARGING = 7;           // 充电模式
+    FALT = 8;               // 故障模式
+    HUMAN = 9;              // 人工驾驶模式
+    ESTOP = 10;             // 急停模式
+    LOADING = 11;           // 装卸货模式
+  }
+
+  optional float front_wheel_angle = 1;   // 前轮转角度数
+  optional Retarder retarder_status = 2;  // 缓速器状态
+  optional AngleQualifactor anglequalifactor = 3;
+  optional VehicleDrivingDirection driving_direction_state =
+      4;                                           // 车辆行驶方向状态
+  optional double steer_angle_rep_b = 5;           // 车桥B角度反馈
+  optional double vehicle_total_weight = 6;        // 车辆重量反馈
+  optional VehicleRunState vehicle_run_state = 7;  // 整车运行状态
+  optional double max_drive_torque = 8;            // 车辆允许最大扭矩
+  repeated DoorInfo doors_info = 9;
+  optional DcuDrivingMode dcu_driving_mode = 10;  // dcu驾驶模式
+  optional ChargeResponse charge_response = 11;   // 充电响应
+  optional WheelSpeed wheel_speed = 12;           // 轮速信息
+  optional double motor_actual_torque = 13;
+  optional RainStatus rain_status = 14;                     // 雨量状态
+  optional EmergencyStopReason emergency_stop_reason = 15;  // 紧急停车原因
+  optional string dcu_version =
+      16;  // DCU 软件版本 格式为：[车型].[大版本].[小版本]
+}

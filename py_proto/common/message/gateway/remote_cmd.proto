@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/control/control_cmd.proto";
+import "common/message/function_manage/manage_info.proto";
+
+
+message RemoteCmd{
+   optional DeviceCmd device_cmd = 1;          // 底盘和设备控制
+   optional ControlCmd control_cmd = 2;         // 控制命令下发
+}

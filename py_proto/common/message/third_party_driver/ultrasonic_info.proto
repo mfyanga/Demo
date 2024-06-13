@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+import "common/message/header.proto";
+
+package citibot.common.message;
+
+message UltrasonicInfo{
+    optional int32 id = 1;
+    optional float distance = 2;
+    optional float range_max = 3;
+    optional float range_min = 4;
+}
+
+message UltrasonicMsg{
+    optional Header header = 1;
+    repeated UltrasonicInfo ultrasonic_infos = 2;
+}
+
+

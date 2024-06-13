@@ -1,0 +1,43 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/header.proto";
+import "common/message/geometry.proto";
+import "common/message/simulation/simulation_obstacle.proto";
+import "common/message/function_manage/evaluation.proto";
+
+message Uncertainty {
+    optional citibot.common.message.Point3D position_std_dev = 1;
+    optional citibot.common.message.Point3D orientation_std_dev = 2;
+    optional citibot.common.message.Point3D linear_velocity_std_dev = 3;
+}
+
+message Localization{
+    optional citibot.common.message.Header header = 1;  
+    optional citibot.common.message.PointENU position = 2;
+    optional citibot.common.message.Point3D linear_velocity = 3;
+    optional citibot.common.message.Point3D linear_acceleration = 4;
+    optional citibot.common.message.Quaternion orientation = 5;
+    optional double heading = 6;
+    optional citibot.common.message.Point3D euler_angles = 7;
+    optional citibot.common.message.Point3D angular_velocity = 8;
+    optional Uncertainty uncertainty = 9; 
+    optional bool is_simulation = 50[default=false];
+    optional citibot.common.message.SimulationObstacleList simulation_obstacles = 51;
+
+    optional EvaluationResult lidar_evaluation_result = 100;
+ }
+
+ message Odometry{
+    optional citibot.common.message.Header header = 1;
+    optional citibot.common.message.PointENU position = 2;
+    optional citibot.common.message.Quaternion orientation = 3;
+    optional citibot.common.message.Point3D linear_velocity = 4;
+    optional citibot.common.message.Point3D linear_velocity_avg = 5;
+    optional citibot.common.message.Point3D linear_acceleration = 6;
+    optional citibot.common.message.Point3D linear_acceleration_avg = 7;
+    optional citibot.common.message.Point3D angular_velocity = 8;
+    optional citibot.common.message.Point3D angular_velocity_avg = 9;
+    optional citibot.common.message.Point3D euler_angles = 10;
+ }

@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+//创建编队信息
+message CaccInfo{
+  optional int32 queue_id = 1;//在编队中的id,可以理解为队伍名称，用户输入
+  optional int32 max_number = 2;//创建允许的最大编队数量
+  optional string cacc_id = 3;//编队id,hmi可以不填充
+  optional double max_speed = 4;//创建编队，最大行驶速度
+}
+
+//编队指令类型
+enum CaccCommandType {  
+    CACC_FORM = 0;//创建编队
+    CACC_JOIN = 1;//加入编队
+    CACC_LEAVE =2; //离开编队
+    CACC_DISBAND = 3; //解散编队
+}
+
+//hmi指令主动下发
+message CaccCommand {
+  optional CaccCommandType type = 1;//指令类型
+  optional string target_cacc_id = 2;//申请加入的编队id
+  optional CaccInfo cacc_info = 3;//创建编队信息
+  optional string message = 4;//描述
+}
+

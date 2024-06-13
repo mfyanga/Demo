@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+message SchedulerDecisionProto {
+  enum SchedulerDecisionType {  
+    CHANGE_LEFT = 0;//向左变道
+    CHANGE_RIGHT = 1;//向右变道
+    PULLOVER_STOP =2; //靠边停车
+    START = 3; //起步
+    STOP = 4;
+}
+  optional SchedulerDecisionType type =1; // 调度决策类型
+} 
+

@@ -1,0 +1,58 @@
+syntax = "proto2";
+
+import "common/message/geometry.proto";
+import "common/message/map/map_id.proto";
+
+package citibot.common.dispatch;
+
+// 单个障碍物信息
+message DispatchObstacle { 
+    // 障碍物类型
+    enum ObsType{
+        OTHERS      = 0;    // 其他
+        HUMAN       = 1;    // 人
+        VEHICLE     = 2;    // 车
+        MOTORCYCLE  = 3;    // 摩托车
+    }
+    required int32 id = 1;      // 障碍物 ID 
+    required ObsType type = 2;  // 障碍物类型
+    required int32 lng = 3;     // 实际经度*1e7
+    required int32 lat = 4;     // 实际纬度*1e7 
+    optional double heading = 5;//定位朝向
+    optional double speed = 6;   // 速度(m/s)
+    optional uint64 sec = 7;    // 时间戳（unix时间戳，精度毫秒）
+    optional double length = 8;  //目标长度
+    optional double width = 9;   //目标宽度
+    optional double height = 10;   //目标高度
+    optional double offset_x = 11;//定位点相对于目标中心点的前向偏移，单位米，定位点为中心填充0
+    optional double offset_y = 12;//定位点相对于目标中心点的左向偏移，单位米，定位点为中心填充0
+}
+
+//红绿灯，红灯停、绿灯行
+message TrafficLight {
+    enum Color {
+        UNKNOWN = 0;
+        RED = 1;     
+        YELLOW = 2;
+        GREEN = 3;
+        BLACK = 4;
+    };
+    optional Color color = 1;
+    // Traffic light string-ID in the map data.
+    optional string id = 2;
+    // How confidence about the detected results, between 0 and 1.
+    optional double confidence = 3 [default = 1.0];
+    // Duration of the traffic light since detected.
+    optional double tracking_time = 4;
+    // Is traffic blinking
+    optional bool blink = 5;
+    // v2x traffic light remaining time.
+    optional double remaining_time = 6;
+}
+
+
+
+message CloudMessageProto {
+    repeated DispatchObstacle dispatch_obstacle = 1;  // 障碍物信息
+    optional TrafficLight traffic_light =2; // 调度下发的信号灯
+}

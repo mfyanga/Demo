@@ -1,0 +1,44 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/header.proto"; 
+import "common/message/perception/prediction_obstacle.proto"; 
+import "common/message/geometry.proto";
+
+enum PerceptionMapEvaluationStatus {
+  UNEVALUATED = 1;
+  PASS = 2;
+  FAIL = 3;
+};
+
+enum DebugLineType {
+  CAMERA_LEFT_LANE = 1;
+  CAMERA_RIGHT_LANE = 2;
+  CAMERA_LEFT_CURB = 3;
+  CAMERA_RIGHT_CURB = 4;
+  LIDAR_LEFT_CURB = 5;
+  LIDAR_RIGHT_CURB = 6;
+};
+
+message DebugLine {
+  repeated Point3D point = 1;
+  optional DebugLineType type = 2;
+  optional float c0 = 3 [ default = 0.0];
+  optional float c1 = 4 [ default = 0.0];
+  optional float c2 = 5 [ default = 0.0];
+  optional float c3 = 6 [ default = 0.0];
+  optional float c4 = 7 [ default = 0.0];
+  optional float c5 = 8 [ default = 0.0];
+}
+
+message DebugData {
+  repeated DebugLine lines = 1;
+  optional PerceptionMapEvaluationStatus map_evaluate_status = 2;
+}
+
+message PerceptionInfoMsg {
+  optional Header header = 1;
+  optional PredictionObstacles prediction_obstacles = 2;
+  optional DebugData debug_data = 99;
+}

@@ -1,0 +1,63 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/pnc_point.proto";
+
+message SimulationObstacle {
+  enum Type {
+    UNKNOWN = 0;
+    UNKNOWN_MOVABLE = 1;
+    UNKNOWN_UNMOVABLE = 2;
+    PEDESTRIAN = 3;
+    BICYCLE = 4;
+    VEHICLE = 5;
+    WARING_THROUGH = 6;
+    TOLL_BAR = 7;
+    WARING_UNSAFE = 8;
+    PLATFORM = 9;
+    SUSPENDED = 10;
+    GARBAGE = 11;  // 垃圾
+    CHARGING_STATION= 12;//充电桩
+    DUSTBIN = 13;//垃圾桶
+  };
+
+  enum SubType {
+    ST_UNKNOWN = 0;
+    ST_UNKNOWN_MOVABLE = 1;
+    ST_UNKNOWN_UNMOVABLE = 2;
+    ST_PERSON = 3;
+    ST_RIDER = 4;
+    ST_CYCLIST = 5;
+    ST_MOTORCYCLIST = 6;
+    ST_CAR = 7;
+    ST_BUS = 8;
+    ST_TRUCK = 9;
+    ST_TRAIN = 10;
+    ST_TRAFFIC_CONE = 11;
+    ST_TRAFFIC_FENCE = 12;
+    ST_TRAFFIC_LIGHT = 13;
+    ST_TRAFFIC_SIGN = 14;
+    ST_MAN_HOLE_COVER = 15;
+    ST_TOLL_BAR = 16;
+    ST_PLATFORM = 17;
+    ST_LEAVES = 18;   // 路面落叶、树枝等垃圾
+    ST_CONFETTI = 19; // 纸屑、烟头、果皮等垃圾
+    ST_PLASTIC= 20;   // 塑料袋、塑料包装袋等垃圾
+    ST_CANS= 21;      // 塑料瓶、易拉罐等容器类垃圾
+    ST_STONES= 22;    // 路面沙石、小石头等垃圾
+    ST_BRICKS= 23;    // 砖块、石头等尺寸稍大的垃圾
+  };
+
+  optional int32 id = 1 [default = 0];
+  optional citibot.common.message.PathPoint center = 2; 
+  optional double width = 3 [default = 0.0];
+  optional double length = 4 [default = 0.0];
+  optional double speed = 5 [default = 0.0];
+  optional Type type = 6;
+  optional SubType sub_type = 7;
+}
+
+message SimulationObstacleList {
+  repeated SimulationObstacle simulation_obstacle = 1;
+}

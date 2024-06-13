@@ -1,0 +1,119 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/geometry.proto";
+import "common/message/function_manage/manage_info.proto";
+
+
+message TargetParkingSpace {
+  required string id = 1;
+  optional citibot.common.message.Polygon polygon = 2;
+};
+
+message PlanningBehavior {
+  required int32 behavior = 1 [ default = 0 ];
+  oneof addition_info {
+    TargetParkingSpace parking_space = 2;
+  };
+};
+
+message BlockObstacle {
+  required string id = 1;
+  optional Point3D position = 2;
+  optional Point3D velocity = 3;
+  optional double heading = 4 [ default = 0 ];
+  optional double length = 5 [ default = 0 ];
+  optional double width = 6 [ default = 0 ];
+  optional double height = 7 [ default = 0 ];
+};
+
+message ChooserInfo{
+  required string target_lane_id = 1;
+  required int32  target_lane_type = 2;
+}
+
+message ConflictAreaInfo {
+  enum AreaType{
+      // 无效值
+      UNDEFINED_AREA = 0;
+      //狭窄路段
+      NARROW_ROAD = 1;
+      // 开放区域，泊车或者出库使用的区域
+      OPENSPACE_AREA = 2;
+      // 路口区域
+      INTERSECTION_AREA = 3;
+  };
+  enum OccupancyState {
+      // 无效状态
+      UNDEFINED_STATE = 0;
+      // 即将去使用
+      TO_OCCUPY = 1;
+      // 正在使用用
+      OCCUPIED = 2;
+      // 不使用
+      NOT_REQUIRED = 3;
+  };
+  required string id = 1;             // 需要标记的冲突区域对应地图元素id,与地图中一致  
+  required AreaType type = 2;         // 需要标记的冲突区域类型
+  required OccupancyState state = 3;  // 需要标记的冲突区域使用状态
+  optional string derived_id = 4 [default = ""];        // 与id相对应的实际需占用的区域id,如id是停车位的id,derived_id是FreeArea的id,其他类型id=area_id
+}
+
+// LatAdditionalInfo定义
+message LatAdditionalInfo {
+  optional BlockObstacle block_obstacle = 1; //阻塞障碍物信息
+  optional ChooserInfo chooser_info =2; // 新增字段，预留使用
+
+  //横向到达期望的实际距离，用于验证设计期望，单位米，在贴边贴线模式下为车辆侧边缘到达边线的横向距离，循迹模式下为车辆中心到达参考线的横向距离
+  optional double distance_to_target = 3[default = nan];
+
+  //车辆和期望的实际航向角，用于验证设计期望，单位弧度，一致为0，逆时针方向(期望为标准，车辆偏角)
+  //如在贴边贴线模式下为车辆和原点位置边线的夹角，循迹模式下为车辆和原点位置参考线的夹角
+  optional double heading_to_target = 4[default = nan];
+}
+ 
+// LonAdditionalInfo定义
+message LonAdditionalInfo {
+  optional BlockObstacle block_obstacle = 1; //阻塞障碍物信息
+  repeated ConflictAreaInfo conflict_area_info = 4; // 新增字段，用来携带冲突区域状态信息
+
+  //纵向到达期望的实际距离，用于验证设计期望，单位米，如：障碍物阻塞下为车辆前边缘到达障碍物最近点的轨迹距离
+  optional double distance_to_target = 5[default = nan];
+}
+
+
+message LonDecider {
+  required int32 decider = 1 [ default = 0 ];//纵向决策
+  required int32 reason = 2 [ default = 0 ];//纵向决策原因
+
+  optional LonAdditionalInfo additional_info = 4; // 替换oneof addition_info
+};
+
+message LatDecider {
+  required int32 decider = 1 [ default = 0 ];
+  required int32 reason = 2 [ default = 0 ];
+
+  optional LatAdditionalInfo additional_info = 4; // 替换原来的oneof addition_info
+};
+
+message WarningInfo{
+  repeated BlockObstacle ignored_obstacle_list = 1;
+}
+
+message PlanningInfo {
+  optional int32 planning_gear = 1;//规划挡位
+  optional int32 planning_grade = 2 [ default = 0 ];//规划等级
+  optional PlanningBehavior planning_behavior = 3;//规划行为
+  optional LonDecider lon_decider = 5;//纵向决策
+  optional LatDecider lat_decider = 6;//横向决策
+  optional WarningInfo warning_info = 7;//警告类信息
+};
+
+message PlanningStatus {
+  required uint32 error_code = 1 [ default = 0 ];
+  optional uint32 execute_stack = 2 [ default = 0 ];
+  optional PlanningInfo planning_info = 3;
+  optional string device_id = 4;
+  optional ParameterCmd active_parameter = 5;//规划执行生效的参数，正常需要和功能管理的一致
+};

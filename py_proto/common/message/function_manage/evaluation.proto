@@ -1,0 +1,39 @@
+syntax = "proto2";
+
+package citibot.common.message;
+import "common/message/header.proto"; 
+
+// 评价请求与响应协议集合
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~请求相关~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+enum EvaluationType{
+    LIDAR_EVALUATION = 1;   // 激光评价
+    OTHER = 99;             // 后续还有就加
+}
+
+// 自检/评估请求集合
+message EvaluationRequest{
+    optional uint64 timestamp = 1;                      // 请求时间戳,结果需透传
+    repeated EvaluationType evaluation_type = 2;        // 评估请求类型
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~请求相关~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~结果相关~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+enum EvaluationResultType{
+    INVALID = 0;    // 不允许,如场景不允许,条件不允许,输入不满足等情况
+    NORMAL = 1;     // 正常
+    ABNORMAL = 2;   // 异常
+}
+
+message EvaluationResult{
+    optional uint64 timestamp = 1;                                              // 与请求的时间戳一致
+    optional double score = 2;                                                  // 评分,满分100
+    optional EvaluationResultType evaluation_result = 3[default=INVALID];       // 结果类型
+    optional string reason = 4;                                                 // 结果相应说明
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~结果相关~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

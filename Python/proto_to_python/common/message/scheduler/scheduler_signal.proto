@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+//红绿灯，红灯停、绿灯行
+message TrafficLight {
+    enum Color {
+        UNKNOWN = 0;
+        RED = 1;     
+        YELLOW = 2;
+        GREEN = 3;
+        BLACK = 4;
+    };
+    optional Color color = 1;
+    // Traffic light string-ID in the map data.
+    optional string id = 2;
+    // How confidence about the detected results, between 0 and 1.
+    optional double confidence = 3 [default = 1.0];
+    // Duration of the traffic light since detected.
+    optional double tracking_time = 4;
+    // Is traffic blinking
+    optional bool blink = 5;
+    // v2x traffic light remaining time.
+    optional double remaining_time = 6;
+}
+
+message SchedulerSignalProto {
+  optional TrafficLight traffic_light =1; // 调度下发的信号灯
+} 

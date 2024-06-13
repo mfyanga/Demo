@@ -1,0 +1,116 @@
+syntax = "proto2";
+
+//三方节点消息proto数据结构
+import "common/message/dispatch/cloud_message.proto";
+package citibot.common;
+
+enum RainStatus{
+    NONE_RAIN = 0; // 无雨
+    LIGHT_RAIN = 1;//小雨
+    MODERATE_RAIN = 2;//中雨（建议限速等处理）
+    HEAVY_RAIN  = 3;  //大雨（建议暂停作业）
+}
+
+message ThirdPartySensorProto {
+  repeated dispatch.DispatchObstacle dispatch_obstacle = 1;  // 障碍物信息
+  optional dispatch.TrafficLight traffic_light =2; // 调度下发的信号灯
+  optional RainStatus rain_status = 3;//雨量状态
+} 
+
+
+
+enum ObstacleTypePoto {
+  UNKNOWN = 0;
+  UNKNOWN_MOVABLE = 1;
+  UNKNOWN_UNMOVABLE = 2;
+  PEDESTRIAN = 3;  // Pedestrian, usually determined by moving behaviour.
+  BICYCLE = 4;     // bike, motor bike
+  VEHICLE = 5;     // Passenger car or truck.
+  WARING_THROUGH = 6;  //警告，但是可以通过的障碍物，如井盖，建议减速通过
+  TOLL_BAR = 7;  //栏杆
+  WARING_UNSAFE = 8;  //警告，存在危险的障碍物，如三角警告牌，锥桶，水马，小障碍物等
+  PLATFORM = 9;
+  SUSPENDED = 10;
+};
+
+enum SubTypeProto {
+  ST_UNKNOWN = 0; 
+  ST_UNKNOWN_MOVABLE = 1;
+  ST_UNKNOWN_UNMOVABLE = 2;
+  ST_PERSON = 3;
+  ST_RIDER = 4;
+  ST_CYCLIST = 5;
+  ST_MOTORCYCLIST = 6;
+  ST_CAR = 7;
+  ST_BUS = 8;
+  ST_TRUCK = 9;
+  ST_TRAIN = 10;
+  ST_TRAFFIC_CONE = 11;
+  ST_TRAFFIC_FENCE = 12;
+  ST_TRAFFIC_LIGHT = 13;
+  ST_TRAFFIC_SIGN = 14;
+  ST_MAN_HOLE_COVER = 15;
+  ST_TOLL_BAR = 16;
+  ST_PLATFORM = 17;
+};
+
+message Point3dProto{
+  optional double x = 1;
+  optional double y = 2;
+  optional double z = 3;
+};
+
+message PerceptionObstacleProto{
+  optional int32 id = 1;
+  optional Point3dProto position = 2;
+  optional double theta = 3;
+  optional Point3dProto velocity = 4;
+  optional double length = 5;
+  optional double width = 6;
+  optional double height = 7; 
+  optional double tracking_time = 8;
+  optional ObstacleTypePoto type = 9;
+  optional SubTypeProto sub_type = 10;
+  optional double gps_timestamp = 11;
+  optional double confidence = 12;//目标检测置信度，范围0-1
+	optional double type_confidence = 13;//目标类型置信度，内部使用
+  optional string sensor_id = 14;
+};
+
+
+enum HKObstacleType{
+  NO_EVENT = 0;
+  IO = 1;
+  TMA = 2;
+  TMPA = 3;
+  REGION_EXITING = 4;
+  SHELTER_ALARM = 5;
+  FIRE_DETECTION = 6;
+  SMOKE_DETECTION = 7;
+  VMD = 8;
+  FIELD_DETECTION = 9;
+  UNKNOW = 10;
+};
+
+
+message HaiKangObstacleInfo{
+  optional HKObstacleType  type = 1;
+};
+
+message RainSensorInfo{
+  optional int32 sunshine_value = 1;//光线值
+  optional int32 rain_value = 2;//雨量值
+  optional bool big_lamp_request = 3;//大灯请求
+  optional bool small_lamp_request = 4;//小灯请求
+  optional int32 auto_wiper_control = 5;//雨刷请求
+  optional int32 status = 6;//自身状态
+
+}
+
+message CanThirdPartyInfoProto{
+  repeated PerceptionObstacleProto obsttacles = 1;//环视障碍物信息
+  optional RainSensorInfo rain_sensor_info = 2;//雨量传感器数据
+  repeated HaiKangObstacleInfo hk_obstacles = 3;//海康摄像头反馈
+  optional int32 under_car_obstacle_num = 4;//车底障碍物数量
+};
+

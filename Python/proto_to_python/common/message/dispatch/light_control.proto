@@ -1,0 +1,49 @@
+syntax = "proto2";
+package citibot.common.dispatch;
+
+//转向灯信号
+enum TurnLightStatus {
+  TURN_NONE = 0;  //无
+  TURN_LEFT = 1;  //左转
+  TURN_RIGHT = 2;  //右转
+  EMERGENCY_FLASHE = 3;//双闪灯 
+}
+
+// 远近灯光指令
+enum BeamStatus {
+  BEAM_OFF = 0;  //灯光关
+  LOW_BEAM = 1;  //近光灯
+  HIGH_BEAM = 2;  //远光灯
+}
+
+//雾灯
+enum FogLampsStatus {
+  FOGLAMPS_OFF = 0;  //雾灯关
+  FOGLAMPS_ON = 1; //雾灯开
+}
+
+// 雨刮
+enum WiperStatus {
+  NONE = 0;  //无
+  LOW = 1;  //低速
+  MEDIUM = 2;  //中速
+  HIGH = 3;  //高速
+}
+
+message TurnLightStatusProto{
+  optional TurnLightStatus turn_light_status = 1;//转向灯信号
+}
+
+message BeamStatusProto{
+  optional BeamStatus beam_status = 1;//远近灯光指令
+}
+
+message FogLampsStatusProto{
+  optional FogLampsStatus fog_lamps_status = 1;//雾灯
+}
+
+message WiperStatusProto{
+  optional WiperStatus wiper_status = 1;//雨刮
+}
+
+

@@ -1,0 +1,14 @@
+syntax = "proto2";
+package citibot.common.message;
+
+//行驶方向
+enum VehicleDrivingDirection {
+  DIRECTION_A = 0;//A向（正向）
+  DIRECTION_B = 1;//B向（逆向）
+}
+
+//can指令下发
+message DrivingDirectionProto {
+  optional VehicleDrivingDirection driving_direction_cmd = 1;//车辆行驶方向状态
+}
+

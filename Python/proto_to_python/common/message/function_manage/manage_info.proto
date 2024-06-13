@@ -1,0 +1,390 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/header.proto"; 
+import "common/message/geometry.proto";
+import "common/message/chassis/chassis_util.proto";
+import "common/message/function_manage/evaluation.proto";
+import "common/message/gateway/device_input.proto";
+
+//作业模式
+enum SystemMode{
+    FREE = 0;           // 自由模式
+    WORKING = 1;        // 作业模式
+    UNLOAD = 2;         // 卸料模式
+    DEBUG = 3;          // 调试模式
+    CALIBRATION = 4;    // 标定模式
+}
+
+// 功能状态(暂定)
+message FunctionStatus{
+    optional PerceptionFusionMode perception_mode = 1[default = STANDARD_PERCEPTION];   // 感知模式
+    optional bool enable_change_lane = 2 [default = false];                             // 是否开启自主换道决策
+    optional bool enable_avoid_obstacle = 3 [default = false];                          // 是否开启自主避障决策
+    optional bool enable_cloud_control = 4 [default = false];                           // 是否允许云平台控制
+    optional bool enable_cyclic_record = 5[default = false];                            // 循环取证录制
+    optional bool enable_close_loop_record = 6[default = false];                        // 数据闭环录制
+    optional bool enable_data_upload = 7[default = false];                              // 数据上传使能
+    optional bool enable_evaluation_check = 8[default = false];                         // 评估检查使能
+}
+
+// 循迹模式
+enum TrackType{
+    GUIDANCE_TRACK = 0;     // 地图指引模式
+    EDGE_TRACK = 1;         // 贴边模式
+    LINE_TRACK= 2;          // 贴线模式
+}
+
+// 左贴/右贴
+enum TrackDirection{
+    LEFT = 1;
+    RIGHT = 2;
+}
+
+// 作业行驶配置
+message DrivingConfig{
+    optional TrackType track_type = 1;                          // 循迹配置
+    optional TrackDirection direction = 2;                      // 贴左/贴右
+    optional uint32 dist = 3;                                   // 距离(cm)
+    optional uint32 speed = 4;                                  // 车速(km/h)
+    optional bool enable_inspection = 5[default = false];       // 是否巡检
+}
+
+// 作业设备配置
+message DeviceConfig{
+    optional SweepMode sweep = 1;
+    optional FanMode fan = 2;
+    optional OnOffRequest sweep_spray = 3;
+    optional bool eco_pro = 4[default=false];
+}
+
+
+enum LocalizationMode {
+  RTK = 0;  // 在GPS信号好时状态正常，标定时只能使用RTK模式
+  MSF =
+      1;  // 融合GPS和激光定位（需提前准备激光地图），可适用于GPS异常的地方，正式运行后一般使用MSF
+}
+
+enum EnvFusionMode {
+  NAVIGATION = 0;  // 透传模式,除了叠加信号灯完全透传地图数据，主要用于验证地图
+  FUSION = 1;      // 融合模式，融合感知车道线等数据
+  LANE_MARKER = 2;  // 车道线模式，只基于车道线数据
+}
+
+enum PerceptionFusionMode {
+  STANDARD_PERCEPTION = 0;  // 标准感知模式
+  V2X_PERCEPTION = 1;       // v2x感知模式，一般用于真值测试
+  STANDARD_AND_V2X_PERCEPTION = 2;         // 标准感知+v2x感知
+  STANDARD_AND_V2X_SHARED_PERCEPTION = 3;  // 标准感知+v2x共享感知
+  NONE_PERCEPTION = 4;                     // 无感知模式，用于测试
+}
+
+message UsrConfigInfo {
+  optional uint64 version = 1[default = 0];  //版本号,使用时间命名
+  optional uint64 update_time = 2[default = 0];//更新时间
+}
+
+// 用户配置
+message UsrConfig{
+    optional UsrConfigInfo config_info = 1;
+    optional DrivingConfig driving_conf = 2;
+    optional DeviceConfig device_conf = 3;
+    optional FunctionStatus function_status = 4;
+    optional InitPosCmd init_location = 5;
+}
+
+// 驾驶行为
+enum DrivingBehavior{
+    C0MMON_STOP = 0;        // 减速停车 
+    NORMAL_DRIVING = 1;     // 正常行驶
+}
+
+// 参数控制
+message ParameterCmd{
+    optional TrackType track_type = 1;                              // 循迹模式
+    optional TrackDirection direction = 2;                          // 贴左/贴右
+    optional uint32 dist = 3;                                       // 贴边贴线距离(cm)
+    optional double speed_limit = 4;                                // 车速(ms/s)
+    optional DrivingBehavior driving_behavior = 5;                  // 主要用于系统指导规划的行为，比如故障停车时，通过该字段先指导规划将车停稳后再 下发指令退出自动驾驶。
+    optional bool enable_change_lane = 11 [default = false];        // 是否开启自主换道决策
+    optional bool enable_avoid_obstacle = 12 [default = false];     // 是否开启自主避障决策
+    optional bool enable_inspection = 13 [default = false];         // 是否开启巡检
+
+    
+    optional PerceptionFusionMode perception_fusion_mode = 21[default = STANDARD_PERCEPTION];// 感知融合模式
+
+    // 定位模式。RTK：在GPS信号好时状态正常，MSF：融合GPS和激光定位（需提前准备激光地图），可适用于GPS异常的地方，标定时只能使用RTK模式，正式运行后一般使用MSF
+    optional LocalizationMode localization_mode = 31 [default = RTK];
+    
+}
+
+// enum SweepMode{
+//     STEPLESS = 0;       // 0：无极调速模式；
+//     MIDDLE_SPEED = 1;   // 1：中速旋转模式
+//     HIGH_SPEED = 2;     // 2：高速旋转模式
+//     REVERT = 3;         // 3：保留
+// }
+
+enum NavigationStage{
+    INITIAL_STAGE = 0;      // 初始状态
+    ROUTE_SELECTED = 1;     // 已选路
+    NAVIGATED = 2;          // 已导航,可以进入自动驾驶
+    DRIVING = 3;            // 正在行驶中
+}
+
+message NavigationInfo{
+    optional NavigationStage stage = 1;     // 导航的阶段，主要用于对外的显示相关
+    // optional RoutingRequset request = 2;    // 导航请求(预留，暂不支持)
+}
+
+message PowerCmd{
+  optional OnOffRequest box_fan = 1;
+  optional OnOffRequest can_dtu = 2;
+  optional OnOffRequest m12 = 3;
+  optional OnOffRequest led_disp = 4;
+  optional OnOffRequest led_controller = 5;
+  optional OnOffRequest singleline_lidar = 6;
+  optional OnOffRequest dj_lidar = 7;
+  optional OnOffRequest mid360_left = 8;
+  optional OnOffRequest mid360_right = 9;
+  optional OnOffRequest ultrasonic = 10;
+  optional OnOffRequest cgi220 = 11;
+  optional OnOffRequest mtb = 12;
+  optional OnOffRequest mdc = 13;
+  optional OnOffRequest radar = 14;     
+};
+
+
+// 设备控制(待底盘接口先更新)
+message DeviceCmd{
+    // 上装工作使能,一键清扫，开启风机和扫盘
+    optional OnOffRequest work_enable = 1; 
+    // 扫盘作业模式   
+    optional SweepMode sweep = 2;
+    // 风机工作状态        
+    optional FanMode Fan = 3;  
+    // 上装箱体运动,举升or复位     
+    optional OnOffRequest garbage_position = 4;   
+    // 上装后门状态，后门开启or关闭 
+    optional OnOffRequest back_door = 5;
+    // 上装清洗状态，一键清洗，料箱清淤 
+    optional OnOffRequest garbage_washing = 6;
+    // 干、湿扫开关
+    optional OnOffRequest wet_seep = 7; 
+    //上装作业模式
+    optional OnOffRequest work_mode = 8; 
+    // 示廓灯
+    optional OnOffRequest positon_lamp = 9;
+    // 远光灯
+    optional OnOffRequest high_beam = 10;
+    // 近光灯
+    optional OnOffRequest low_beam = 11;
+    // 左转向灯
+    optional OnOffRequest turn_left = 12;
+    // 右转向灯
+    optional OnOffRequest turn_right = 13;
+    // 雾灯
+    optional OnOffRequest frog_lamp = 14;
+    // 危险警告灯
+    optional OnOffRequest hazard_warning_lamp = 15;
+    // 喇叭
+    optional OnOffRequest horn = 16;
+    // 上装作业灯
+    optional OnOffRequest work_lamp = 17;
+    // 雨刷洗涤
+    optional OnOffRequest wiper_washing = 18;
+    // 雨刮
+    optional OnOffRequest wiper = 19;
+    // 震动除尘
+    optional OnOffRequest vibrating_dust = 20;
+    // 一键倾倒：组合举升，开门操作
+    optional OnOffRequest one_key_dump = 21;
+    // 扫盘喷水
+    optional OnOffRequest sweep_spray = 22;
+    // 吸嘴挡板
+    optional OnOffRequest nozzle = 23;
+    // 扫盘升降 on:升，off降  0无操作
+    optional OnOffRequest sweep_updown = 24;
+    // 吸嘴升降on:升，off降  0无操作
+    optional OnOffRequest nozzle_updown = 25;
+    // 开始加水on:开始, off停止 0无操作 :下发后监测到正在加水，马上切到无操作
+    optional OnOffRequest water_filling = 26;
+    // 洗车枪 on:开 其他:关
+    optional OnOffRequest wash_gun = 27;
+    // 调试扫盘使能 on:开 其他:关
+    optional OnOffRequest debug_sweep = 28;
+    // 调试风机使能 on:开 其他:关
+    optional OnOffRequest debug_fan = 29;
+
+    //语音控制  0：等待上一次语音播放完成后关闭，  非0：按照当前id优先播放语音，播放完成后重复播放。
+    optional uint32 voice_cmd = 30; 
+
+    //VCU模式请求 0:无请求(暂不支持，默认人工模式)  1：智驾线控模式 2：遥控器模式（暂不支持默认人工模式） 3：人工驾驶模式  其他：默认人工模式
+    optional uint32 vcu_mode_request = 31; 
+
+    optional PowerCmd power_cmd = 32;
+
+    optional double fan_speed = 33;//仅在无极模式有效
+    optional double sweep_speed = 34;//仅在无极模式有效
+    optional SteeringMode steering_mode_man = 35;//底盘人工模式下的转向模式控制
+    optional OnOffRequest auto_run = 36;//上装磨合测试使能
+    optional OnOffRequest auto_run_clear = 37;//上装磨合测试计数清零
+
+}
+
+message DataRecord {
+    // 数据采集使能,0不录制或者结束，1录制数据
+    optional int32 recode_enable = 1 [default = 0];
+    optional string bag_path = 2;                                     // bag保存路径
+    optional string bag_name = 3;                                     // bag名称
+    enum RecordType{
+        CUSTOM = 0;         // 自定义topic,配合instance_id使用
+        RECORD_ALL = 1;     // 录制全部
+    }
+    optional RecordType record_type = 4[default=RECORD_ALL];
+    optional uint64 start_time = 5;                                   // 开始时间录制时间
+    optional uint64 duration_time = 6;                                // 录制时长timestamp
+    optional uint64 token = 7;                                        // 任务token
+    repeated int32 enable_instance_id = 8;                            // 专门提供给gateway,用于显示当前能录制的bag包。
+    optional bool is_recording = 9[default = false];                  // 提供给gateway提示是否正在录制
+    repeated int32 instance_id = 10;                                  // 需要采集的数据InstanceID 
+
+    optional bool recode_all = 20 [default = false];                  // 是否采集所有数据,为true时instance_id可置空(后续废弃,可被record_type替代)
+}
+
+message DataRecordRequest{
+    optional DataRecord common_record = 1;          // 常规录制请求
+    optional DataRecord cyclic_record = 2;          // 取证循环录制请求
+    optional DataRecord closed_loop_record = 3;     // 数据闭环录制请求
+}
+  
+// 评估结果结合
+message Evaluation{
+    optional EvaluationResult lidar_evaluation = 1; // 上次激光评估结果
+}
+
+//初始位置设置
+message InitPosCmd{
+    optional double init_latitude = 1 [default = 0];//初始纬度
+    optional double init_longitude = 2 [default = 0];//初始经度
+    optional double init_elevation = 3 [default = 0];//初始高度
+    optional double init_heading = 4 [default = 0.0];//初始姿态
+}
+
+message DrivingInfo {
+  //更新时间
+  optional string update_time = 1;
+
+  //总里程，单位m
+  optional double total_mileage = 2 [default = 0];
+
+  //自动驾驶里程，单位m
+  optional double auto_mileage = 3 [default = 0];
+
+  //自动驾驶时长，单位s
+  optional double auto_duration = 4 [default = 0];
+
+  //自动驾驶里程(来源底盘)，单位m
+  optional double auto_mileage_from_chassis = 5 [default = 0];
+
+  //自动驾驶能耗(度),自动驾驶非充电状态下的电量积分
+  optional double auto_cost_energy = 11 [default = 0];
+
+  //总能耗(度),非充电状态下的电量积分
+  optional double total_cost_energy = 12 [default = 0];
+
+  //清扫时长，单位s
+  optional double auto_clean_duration = 13 [default = 0];
+
+  //清扫里程，单位m
+  optional double auto_clean_mileage = 14 [default = 0];
+}
+
+// 退出自动驾驶事件上报
+message DrivingReport{
+    enum ExitType{
+        UNKOWN_EXIT = 0;
+        NORMAL_EXIT = 1;
+        TAKE_OVER_EXIT = 2;
+        FAULT_EXIT = 3;
+        EMERGENCY_EXIT = 4;
+        BLOCK_EXIT = 5;
+        ORDER_EXIT = 6;
+    }
+    optional uint64 update_timestamp = 1;
+    optional uint64 auto_start_timestamp = 2 ;
+    optional uint64 auto_exit_timestamp = 3;
+    optional double auto_driving_time_s = 4 [default = 0];
+    optional double auto_mileage_m = 5;
+    optional PointLLH pos_start = 6;
+    optional PointLLH pos_end = 7;
+    optional ExitType exit_type = 8;
+    optional uint32 error_code = 9;
+    optional string exit_reason = 10;
+}
+
+message SystemEvent{
+    optional DrivingReport driving_report = 1;                  // 退出自动驾驶事件
+}
+
+message VersionDetail{
+    optional string software_name = 1;
+    optional string software_type = 2;
+    optional string software_model = 3;
+    optional string software_version = 4;
+}
+
+message VersionInfo{
+    repeated VersionDetail version_detail = 1;
+}
+
+//智驾系统状态
+enum AdsSystemStatus {
+  SYSTEM_UNKNOWN = 0;                                // 系统未知状态
+  CHASSIS_NOT_READY = 1;                             // 底盘未准备好
+  LOCATION_NOT_INIT = 2;                             // 定位未初始化,此时需要等待初始化或人工触发，或移动车辆到室外
+  SYSTEM_FAILURE  = 3;                               // 系统故障，三级以上故障，或者关键故障，车辆无法继续行驶
+  SYSTEM_READY  = 4;                                 // 系统准备中，可以下发任务
+  SYSTEM_STANDBY  = 5;                               // 系统待命，可以启动或继续任务
+  SYSTEM_UPGRADE = 6;                                // 系统更新
+  SYSTEM_AUTO_DRIVING  = 7;                          // 系统自动驾驶中
+  SYSTEM_REMOTE_DRIVING = 8;                         // 系统远程驾驶中
+}
+
+//系统信息
+message SystemInfo{
+    optional DrivingInfo driving_info = 1;
+    optional VersionInfo version_info = 2;
+    optional AdsSystemStatus system_status = 3;
+}
+
+// 泊车目标标定信息
+message ParkingCalibratedInfo{
+    optional double def_charging_station_x = 1[default = 0];
+    optional double charging_station_offset_x = 2[default = 0];
+    optional double def_dustbin_x = 3[default = 0];
+    optional double dustbin_offset_x = 4[default = 0];    
+}
+
+message ManageInfoMsg{
+    optional Header header = 1;                             // 通用消息头
+    optional SystemMode system_mode =2;                     // 作业模式，模块休眠使用
+    optional uint64 system_mode_token = 3;                  // 系统模式切换token，模式切换时更新，使用时间戳，
+    optional DrivingRequest driving_request = 4;            // 驾驶模式请求
+    optional UsrConfig usr_config = 6;                      // 对外的配置参数
+    optional ParameterCmd parameters = 7;                   // 参数控制，模块内部使用，主要是规控配置作业参数
+    optional DeviceCmd device_cmd = 8;                      // 底盘和设备控制
+    optional Evaluation evaluation = 9;                     // 评估结果集合,一般保存上次评估结果
+    optional NavigationInfo navi_info = 10;                 // 导航信息，用于对外展示阶段，记录路线请求相关。
+    optional DataRecord data_record = 11;                   // 数据采集
+    optional SystemInfo system_info = 12;                   // 系统信息
+    optional DataRecordRequest record_request = 13;         // 数据采集请求状态集合
+    optional ParkingCalibratedInfo parking_calibrated_info = 14; //泊车标定目标（充电桩，垃圾桶）信息
+    optional InitPosCmd init_pos = 21;                      // 初始位置设置，适用于仿真或者定位无gps初始化,一段时间内位置吻合反馈成功，否则反馈超时不再发送，再次触发继续发送
+    
+    optional SystemEvent system_event = 30;                 // 系统事件集成 
+    optional EvaluationRequest evaluation_reqeust = 31;     // 评估请求集合
+
+    optional ExternalGpsInfo external_gps = 50;             // 外部GPS信息
+}

@@ -1,0 +1,24 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/header.proto"; 
+
+// diagnosis trouble code
+message DTC {
+  required uint32 code = 1[default = 0];
+  required string tips = 2;
+}
+
+message DtcNode {
+  required DTC dtc = 1;
+}
+
+message NodeDiagInfo {
+  required citibot.common.message.Header header = 1;
+
+  required DTC dtc = 2;
+
+  
+
+}

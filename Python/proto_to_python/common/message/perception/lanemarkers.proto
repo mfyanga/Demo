@@ -1,0 +1,61 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/header.proto"; 
+
+message Point3F {
+  optional float x = 1 [default = nan];
+  optional float y = 2 [default = nan];
+  optional float z = 3 [default = nan];
+}
+
+enum SpatialLabelType {
+  L_0 = 0;
+  L_1 = 1;
+  L_2 = 2;
+  R_0 = 3;
+  R_1 = 4;
+  R_2 = 5;
+  L_UNKNOWN = 6;
+  R_UNKNOWN = 7;
+  UNKNOWN = 8; 
+};
+
+enum LanemarkerType {
+  UNKNOWN_LANEMARKERS = 0;
+  DOTS_LANEMARKERS = 1;
+  SOLID_LANEMARKERS = 2;
+  SOLID_DOTS_LANEMARKERS = 3;
+  DOTS_SOLID_LANEMARKERS = 4;
+  UNDRIVABLE_AREA = 5;
+  DRIVABLE_AREA = 6;
+  CURB = 7;
+};
+
+message LaneParam {
+  optional float start = 1 [default = nan];
+  optional float end = 2 [default = nan];
+  optional float c0 = 3 [default = nan];
+  optional float c1 = 4 [default = nan];
+  optional float c2 = 5 [default = nan];
+  optional float c3 = 6 [default = nan];
+  optional float c4 = 7 [default = nan];
+  optional float c5 = 8 [default = nan];
+  repeated Point3F samples = 9;
+}
+
+message Lanemarker {
+  optional LaneParam world_lane = 1;
+  optional LaneParam image_lane = 2;
+  optional LanemarkerType type = 3 [default = UNKNOWN_LANEMARKERS];
+  optional SpatialLabelType spatial = 4 [default = UNKNOWN];
+  optional uint32 track_id = 5;
+}
+
+message LanemarkersMsg {
+  optional citibot.common.message.Header header = 1;
+  optional string sensor_id = 2;
+  repeated Lanemarker lanemarkers = 3;
+}
+

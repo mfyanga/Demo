@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package citibot.common.hdmap;
+
+import "common/message/geometry.proto";
+import "common/message/map/map_id.proto";
+import "common/message/map/map_geometry.proto";
+
+message MarkLine {
+  enum Type {
+    UNKNOWN = 0;
+    BARRIER = 1; // barrier gate
+    GANTRY = 2;
+    // 入换点、排队等待线
+    QUEUING = 3;
+  };
+
+  optional Id id = 1;
+  repeated Id overlap_id = 2;
+  repeated Curve line = 3;
+  optional Type type = 4;
+  optional citibot.common.message.Size size = 5;
+}

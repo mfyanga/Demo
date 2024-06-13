@@ -1,0 +1,206 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+// 底盘模式
+enum ChassisMode {
+  CHASSIS_MODE_INIT = 0;          // 初值
+  CHASSIS_MODE_MANUAL = 1;        // 人工驾驶模式
+  CHASSIS_MODE_PREPARING = 2;     // 握手中
+  CHASSIS_MODE_L2_STANDBY = 3;    // L2 就绪
+  CHASSIS_MODE_L4_STANDBY = 4;    // L4 就绪
+  CHASSIS_MODE_TELE_CONTROL = 5;  // 远程（驾驶舱）控制模式
+  CHASSIS_MODE_REMOTE = 6;        // 遥控器控制模式
+  CHASSIS_MODE_AUTO = 7;  // 智驾自动驾驶控制模式, 充电，加水，都支持
+  CHASSIS_MODE_ESTOP = 8;  // 紧急停车模式
+  CHASSIS_MODE_FAULT = 9;  // 故障模式
+};
+
+// 驾驶指令
+enum DrivingOrder {
+  AUTOMATIC = 1;      // 自动
+  NON_AUTOMATIC = 2;  // 非自动
+  ESTOP = 3; //紧急停车
+}
+
+// 驾驶指令请求
+// 启动自动驾驶流程：功能管理先设置token，规控透传后，底盘回传token，然后再功能管理变更模式，底盘进入自动驾驶，token有效期10s
+message DrivingRequest {
+  optional DrivingOrder driving_order =
+      1;  // 驾驶模式指令切换，是否进入或者退出自动驾驶，持续下发
+  optional uint64 driving_order_token =
+      2;  // 模式切换校验使用，使用时间戳，同一次自动驾驶token不变，退出自动驾驶后置0，重新进入更新token
+};
+
+// 速度模式
+enum ThrottleMode {
+  THROTTLE_MODE_SPEED = 0;         // 速度模式
+  THROTTLE_MODE_PEDAL = 1;         // 开度模式
+  THROTTLE_MODE_ACC_THROTTLE = 2;  // 加速度模式
+};
+
+// 手刹请求
+enum EpbRequest {
+  EPB_REQUEST_NO = 0;       // 无请求
+  EPB_REQUEST_RELEASE = 1;  // 释放
+  EPB_REQUEST_ACTIVE = 2;   // 拉起
+};
+
+// 手刹状态
+enum EpbStatus {
+  EPB_STATUS_RELEASE = 0;    // 释放
+  EPB_STATUS_ACTIVE = 1;     // 拉起
+  EPB_STATUS_RELEASING = 2;  // 释放中
+  EPB_STATUS_ACTIVING = 3;   // 拉起中
+  EPB_STATUS_UNKNOWN = 4;    // 未知
+};
+
+// 转向模式
+enum SteeringMode {
+  STEERING_MODE_FRONT_ACKERMAN = 0;      // 仅前轮阿克曼转向
+  STEERING_MODE_SAME_FROM_AND_BACK = 1;  // 前后轮同向转（角度相同）
+  STEERING_MODE_FRONT_DIFFERENT_BACK = 2;  // 前后轮异向转（角度相同）
+  STEERING_MODE_BACK_ACKERMAN = 3;         // 仅后轮阿克曼转向
+  STEERING_MODE_FRONT_BACK = 4;            // 未知
+};
+
+// 紧急停车模式
+enum EstopStatus {
+  ESTOP_STATUS_NO_STOP = 0;
+  ESTOP_STATUS_CHASSIS = 1;
+  ESTOP_STATUS_REMOTE = 2;
+  ESTOP_STATUS_CHASSIS_ERROR = 3;
+};
+
+// 总电源状态
+enum DcDcStatus {
+  DCDC_OFF = 0;
+  DCDC_ON = 1;
+  DCDC_STANDBY = 2;
+};
+
+// 充电状态
+enum ChargeStatus {
+  NO_CHARGING = 0;
+  CHARGING = 1;
+  CHARGE_FULL = 2;
+};
+
+// 钥匙状态
+enum KeyStatus {
+  KEY_OFF = 0;
+  KEY_ACC = 1;
+  KEY_ON = 2;
+  KEY_START = 3;
+};
+
+enum RangeStatus{
+  RANGE_0 = 0;
+  RANGE_1 = 1;
+  RANGE_2 = 2;
+  RANGE_3 = 3;
+};
+
+enum HmiKeyInput{
+  HMI_KEY_NULL = 0;
+  HMI_KEY_UP = 1;
+  HMI_KEY_DOWN = 2;
+};
+
+// 通用开关请求
+enum OnOffRequest {
+  NO_REQUEST = 0;     // 无请求
+  ON_REQUEST = 1;     // 请求开
+  OFF_REQUEST = 2;    // 请求关
+  PAUSE_REQUEST = 3;  // 请求暂停
+  HALF_OPEN_REQUEST = 4;//请求半开
+};
+
+// 通用开关状态
+enum OnOffStatus {
+  INIT_OR_NO_DEVICE = 0;      // 初值或无动作
+  STATUS_OFF = 1;             // 状态开
+  STATUS_ON = 2;              // 状态关
+  STATUS_ERROR = 3;           // 状态异常
+  STATUS_OFF_PROCESSING = 4;  // 状态关闭中
+  STATUS_ON_PROCESSING = 5;   // 状态开启中
+  STATUS_PAUSE = 6;           // 状态暂停
+  STATUS_HALF_OPEN = 7;       // 半开稳定状态
+};
+
+// 扫盘
+enum SweepMode {
+  SWEEP_MODE_STOP = 0;          // 3：关闭
+  SWEEP_MODE_LOW_SPEED = 1;    // 1：低速旋转模式
+  SWEEP_MODE_MIDDLE_SPEED = 2;    // 1：中速旋转模式
+  SWEEP_MODE_HIGH_SPEED = 3;      // 2：高速旋转模式
+  SWEEP_MODE_STEPLESS_SWEEP = 4;  // 4：无极调速模式；
+  SWEEP_MODE_REVERT = 5;//保留
+};
+
+// 风机
+enum FanMode {
+  FAN_MODE_STOP = 0;        // 0：关闭
+  FAN_MODE_NORMAL = 1;        // 1：保洁模式-->低速
+  FAN_MODE_STRONG = 2;        // 2：强力模式-->中速
+  FAN_MODE_ENHANCE = 3;       // 3：增强模式-->高速
+  FAN_MODE_STEPLESS_FAN = 4;  // 0：无极调速模式；
+};
+
+// 挡位
+enum GearMode {
+  NO_USE = 0;
+  D_POSITION = 1;  // D挡
+  N_POSITION = 2;  // N挡
+  R_POSITION = 3;  // R挡
+  P_POSITION = 4;  // P挡
+};
+
+message HmiInput{
+  optional OnOffStatus one_key_auto = 1[default = INIT_OR_NO_DEVICE];
+  optional RangeStatus speed_range = 2[default = RANGE_0];
+  optional HmiKeyInput edge_distance= 3[default = HMI_KEY_NULL];
+};
+
+message TirePressure{
+    // 胎压左前轮  单位：(kpa)
+  optional double tire_pressure_front_left = 1[default = 0.00];
+  // 胎压右前轮  单位：(kpa)
+  optional double tire_pressure_front_right = 2[default = 0.00];
+  // 胎压坐后轮  单位：(kpa)
+  optional double tire_pressure_rear_left = 3[default = 0.00];
+  // 胎压右后轮  单位：(kpa)
+  optional double tire_pressure_rear_right = 4[default = 0.00];
+  //传感器状态  0:  0x0: No warning. 0x1: High pressure warning.0x2: Low pressure warning.
+  //0x3: Quik leakage. 0x4: Lost Sensor0x5: Sensor battery low0x6: Sensor failure 
+  //0x7: Reserved
+  optional uint32 sensor_state_front_left = 5[default = 0];
+  optional uint32 sensor_state_front_right = 6[default = 0];
+  optional uint32 sensor_state_rear_left = 7[default = 0];
+  optional uint32 sensor_state_rear_right = 8[default = 0];
+};
+
+message PowerStatus{
+  optional uint32 on_off = 1[default = 0];// 开关状态
+  optional double current = 2[default = 0.0];                  // 负载电流
+  optional uint32 temp_over_error = 3[default = 0];     // 过温状态
+  optional uint32 current_over_error = 4[default = 0];  // 过流故障
+  optional uint32 chip_error = 5[default = 0];          // 芯片故障
+};
+
+message PowerInfo{
+  optional PowerStatus box_fan = 1;
+  optional PowerStatus can_dtu = 2;
+  optional PowerStatus m12 = 3;
+  optional PowerStatus led_disp = 4;
+  optional PowerStatus led_controller = 5;
+  optional PowerStatus singleline_lidar = 6;
+  optional PowerStatus dj_lidar = 7;
+  optional PowerStatus mid360_left = 8;
+  optional PowerStatus mid360_right = 9;
+  optional PowerStatus ultrasonic = 10;
+  optional PowerStatus cgi220 = 11;
+  optional PowerStatus mtb = 12;
+  optional PowerStatus mdc = 13;
+  optional PowerStatus radar = 14;  
+};  

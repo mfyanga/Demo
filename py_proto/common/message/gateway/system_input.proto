@@ -1,0 +1,91 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+import "common/message/header.proto";
+import "common/message/function_manage/evaluation.proto";
+import "common/message/function_manage/manage_info.proto";
+
+enum SystemMissionType {
+  // L2/L4共有部分从1开始
+  WORK_MODE_SWITCH = 1;     // 作业模式切换
+  DRIVING_ORDER = 2;        // 自动驾驶相关指令
+  USR_SETTING = 3;          // 用户配置设置
+  PARA_SETTING = 4;         // 作业参数设置
+  SYSTEM_UPDATE = 5;        // 系统更新
+  SYSTEM_RESTART = 6;       // 系统重启
+  DEVICE_CONTROL = 7;       // 设备控制
+  START_WATER_FILLING = 8;  // 开始加水
+  STOP_WATER_FILLING = 9;   // 结束加水
+  AUTO_DUMPING = 10;        // 一键倾倒   
+  STOP_DUMPING = 11;        // 结束倾倒
+
+  // 调试相关
+  START_RECORD = 100;
+  STOP_RECORD = 101;
+
+  // L2特有部分从200开始
+
+  // L4特有部分从400开始
+  ROUTING_REQ = 400;
+  START_NAVI = 401;
+  END_NAVI = 402;
+  CLOUD_MISSION = 420;        // 云平台任务Mission
+
+  // 高阶功能
+  RELOCATION = 600;           // 仿真重定位
+  SET_INIT_POS = 601;         // 设置重定位文件
+  LOCATION_INIT = 602;        // 加载默认重定位配置文件进行重定位
+  EVALUATION = 603;           // 评估任务
+  PARKING_CALIBRATION = 604;  // 车位校准
+}
+
+enum DrivingAction {
+  EXIT_AUTOMATIC = 0;   // 退出自动驾驶模式
+  ENTER_AUTOMATIC = 1;  // 进入自动驾驶模式
+  EMERGENCY_STOP = 2;   // 进入紧急停车
+}
+
+message DrivingCmd {
+  required DrivingAction action = 1;
+  optional DrivingConfig driving_conf = 2;
+}
+
+enum CloudMissionType{
+  TYPE_UNKNOWN = 0;       // 未知任务
+  MISSION_CANCEL = 1;     // 任务取消 
+  MISSION_COMPLETE = 2;   // 任务完成
+  BREAKPOINT_CANCEL = 3;  // 断点取消
+
+  MOVE = 10;              // 移动任务
+  CLEAN = 11;             // 清扫任务
+  CHARGE = 12;            // 充电任务
+  WATER_FILLING = 13;     // 加水任务
+  DUMP = 14;              // 倒垃圾任务
+}
+
+enum ParkingCaliType {  
+  CHARGING_CALI = 0;   // 充电桩校准
+  GARBAGE_CALI  = 1;   // 垃圾箱校准
+  UNKNOWN_CALI = 20;    // 未知类型
+}
+
+message SystemInput {
+  optional Header header = 1;
+  optional uint64 token = 2;
+  optional SystemMissionType type = 3;
+  optional SystemMode mode_switch = 4;
+  optional DrivingCmd driving_cmd = 5;
+  optional UsrConfig usr_conf = 6;
+  optional ParameterCmd para_setting = 7; // 等哪个版本删了他
+  optional DeviceCmd device_cmd = 8;
+  optional CloudMissionType cloud_mission_type = 9; // 当系统任务为云平台任务时的任务类型
+
+  optional DataRecord data_record = 20;
+  optional InitPosCmd relocation = 21;
+  optional EvaluationRequest evaluation_req = 22;
+  optional ParkingCaliType parking_cali_type = 23; // 车位校准类型(后续增加车位就增加对应枚举值)
+
+  optional string description = 100;  // 描述
+  optional bytes data = 200;  // 一些特殊输入的proto结构，其他模塊的proto如routingrequest之類的
+}

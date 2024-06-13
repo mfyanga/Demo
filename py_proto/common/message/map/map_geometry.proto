@@ -1,0 +1,40 @@
+syntax = "proto2";
+
+import "common/message/geometry.proto";
+
+package citibot.common.hdmap;
+
+// Polygon, not necessary convex.
+message Polygon {
+  repeated citibot.common.message.PointENU point = 1;
+}
+
+// Straight line segment.
+message LineSegment {
+  repeated citibot.common.message.PointENU point = 1;
+}
+
+// Generalization of a line.
+message CurveSegment {
+  oneof curve_type {
+    LineSegment line_segment = 1;
+  }
+  
+  optional double s = 6;  // start position (s-coordinate)
+  optional citibot.common.message.PointENU start_position = 7;
+  optional double heading = 8;  // start orientation
+  optional double length = 9;
+
+  //系数x是纵向，函数值y是横向,y= c0 + c1 * x + c2 * x^2 +c3 * x^3,start和end为起始和终点位置的x，单位米
+  optional double c0 = 20;
+  optional double c1 = 21;
+  optional double c2 = 22;
+  optional double c3 = 23;
+  optional double start = 24;
+  optional double end = 25;
+}
+
+// An object similar to a line but that need not be straight.
+message Curve {
+  repeated CurveSegment segment = 1;
+}

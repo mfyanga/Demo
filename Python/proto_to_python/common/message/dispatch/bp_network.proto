@@ -1,0 +1,39 @@
+syntax = "proto2";
+
+package citibot.common.dispatch;
+
+import "common/message/map/map_id.proto";
+import "common/message/geometry.proto";
+import "common/message/routing/routing.proto";
+
+message DestinationInfo{
+  enum Type{
+    // 无导航路径外其他终点，按照导航走到末端即可
+    NONE = 1;
+    // 破碎站
+    CRUSHING_STATION = 2;
+    // 装矿点
+    LOADING_STATION = 3;
+    // 卸矿点
+    UNLOADING_STATION = 4;
+  };
+  required Type type = 1;
+  // 装矿区爆堆ID，破碎站破碎口ID
+  optional citibot.common.hdmap.Id id = 2;
+  // 设备坐标（装矿点挖机坐标；破碎站车位坐标）
+  optional citibot.common.message.PointENU position = 3;
+}
+
+message BPRouting {
+  optional citibot.common.hdmap.Id id = 1;//named as "from_loc_id&to_loc_id"
+  optional citibot.common.hdmap.Id from_loc_id = 2;
+  optional citibot.common.hdmap.Id to_loc_id = 3;
+  optional citibot.common.routing.RoutingResponse route = 4;
+  repeated citibot.common.message.PointENU pathpoint = 5; // 路径中心点
+  optional DestinationInfo destination = 6;
+}
+
+message BPNetwork {
+  optional string hdmap_version = 1;
+  repeated BPRouting routing = 2;
+}

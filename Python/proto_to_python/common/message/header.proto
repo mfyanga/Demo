@@ -1,0 +1,33 @@
+syntax = "proto2";
+
+package citibot.common.message;
+
+enum MsgStatus {
+  MSG_STATUS_INIT = 0;      // 初始值
+  MSG_STATUS_SLEEP = 1;     // 休眠
+  MSG_STATUS_NORMAL = 2;    // 正常
+  MSG_STATUS_ABNORMAL = 3;  // 异常
+};
+
+message Header {
+  // 消息发送时间，消息发送时刻当前的系统时间，单位微秒
+  optional uint64 timestamp = 1 [default = 0];
+
+  // 测量时间，单位微秒，算法参考的坐标系时间，比如说融合算法是参考同步的车道线消息时间
+  optional uint64 measured_timestamp = 2 [default = 0];
+
+  // 序列号，从0开始，每帧递增
+  optional uint64 sequence_num = 3 [default = 0];
+
+  // 消息状态代码，0-初值，1-休眠，2-正常，3-不正常
+  optional MsgStatus msg_status = 4 [default = MSG_STATUS_INIT];
+
+  // 消息版本号，可以读取模块版本号（module_version），如1.0.2.20230108
+  optional string version = 5;
+
+  // 消息描述，必要的信息补充
+  optional string description = 6;
+
+  // 消息来源,自动填写模块ID，ros转换时填写转换节点id，用来区分
+  optional uint32 source = 7 [default = 0];
+}

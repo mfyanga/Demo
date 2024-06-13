@@ -2,6 +2,7 @@
 target=C11Algorithm
 cflags=--std=c++11 -g
 cc=g++
+
 #src=$(wildcard *.cpp)
 src=$(target).cpp
 
